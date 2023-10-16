@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">rakoon</string>
+    <string name="wi_fi_map">Wi-fi map</string>
+    <string name="welcome_to_rakoon">Welcome to Rakoon!</string>
+    <string name="sound_map">Sound Map</string>
+    <string name="title_activity_map">MapActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <!-- google maps api string -->
+    <string name="my_map_api_key">AIzaSyA97Ku4ag32kmZ5yLlFzLz4ot2icXIHvx4</string>
+</resources>
