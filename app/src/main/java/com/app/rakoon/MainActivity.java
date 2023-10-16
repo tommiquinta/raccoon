@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.gms.location.LocationRequest;
 
 //import androidx.appcompat.app.AppCompatActivity;
 

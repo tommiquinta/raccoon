@@ -3,6 +3,8 @@ package com.app.rakoon;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import com.google.android.gms.location.LocationRequest;
+
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -14,14 +16,17 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -50,15 +55,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			String apiKey = ai.metaData.getString("com.google.android.geo.API_KEY");
 
 			// Initializing the Places API with the help of our API_KEY
-			if (!Places.isInitialized()) {
+		/*	if (!Places.isInitialized()) {
 				Places.initialize(getApplicationContext(), apiKey);
-			}
+			}*/
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
 		}
 
 		// create map fragment
 		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+		assert mapFragment != null;
 		mapFragment.getMapAsync(this);
 
 		// Initializing fused location client
@@ -78,6 +84,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		mMap = googleMap;
+		mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
 		getLastLocation();
 	}
 
@@ -91,6 +99,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 					if (location == null) {
 						requestNewLocationData();
 					} else {
+						mMap.setMyLocationEnabled(true);
+
 						currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 						mMap.clear();
 						mMap.addMarker(new MarkerOptions().position(currentLocation));
@@ -111,22 +121,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	// from previous location
 	@SuppressLint("MissingPermission")
 	private void requestNewLocationData() {
-		LocationRequest mLocationRequest = new LocationRequest();
-		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-		mLocationRequest.setInterval(0);
-		mLocationRequest.setFastestInterval(0);
-		mLocationRequest.setNumUpdates(1);
+		LocationRequest locationRequest = LocationRequest.create()
+				.setWaitForAccurateLocation(true);
+		locationRequest.setInterval(0);
+		locationRequest.setFastestInterval(0);
+		locationRequest.setNumUpdates(1);
 
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-		mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+		mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
 	}
 
 	// If current location could not be located, use last location
 	private final LocationCallback mLocationCallback = new LocationCallback() {
 		@Override
 		public void onLocationResult(@NonNull LocationResult locationResult) {
-			Location mLastLocation = locationResult.getLastLocation();
-			currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+			Location lastLocation = locationResult.getLastLocation();
+
+			assert lastLocation != null;
+			currentLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 		}
 	};
 
