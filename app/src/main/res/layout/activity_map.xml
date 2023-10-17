@@ -14,7 +14,7 @@
         tools:context=".MapsActivity" />
 
     <Button
-        android:id="@+id/currentLoc"
+        android:id="@+id/getDecibel"
         android:layout_width="50sp"
         android:layout_height="50sp"
         android:layout_alignParentTop="true"

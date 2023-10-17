@@ -3,6 +3,7 @@ package com.app.rakoon;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+
 import com.google.android.gms.location.LocationRequest;
 
 import android.content.Intent;
@@ -10,7 +11,12 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.View;
@@ -20,6 +26,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -35,6 +42,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 
+import java.io.IOException;
+
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 	private final int PERMISSION_ID = 42;
@@ -43,6 +52,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	// Current Location is set to Bologna
 	private LatLng currentLocation;
+
+	// audio
+	private MediaRecorder mediaRecorder;
+	private boolean isRecording = false;
+	private AudioRecord audioRecord;
+
+	private int bufferSize;
+	private short[] audioData;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +73,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			String apiKey = ai.metaData.getString("com.google.android.geo.API_KEY");
 
 			// Initializing the Places API with the help of our API_KEY
-		/*	if (!Places.isInitialized()) {
+		/*
+			if (!Places.isInitialized()) {
 				Places.initialize(getApplicationContext(), apiKey);
 			}*/
 		} catch (PackageManager.NameNotFoundException e) {
@@ -71,11 +90,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 		// button to
-		Button backToLocation = findViewById(R.id.currentLoc);
-		backToLocation.setOnClickListener(new View.OnClickListener() {
+		Button getDecibel = findViewById(R.id.getDecibel);
+
+		bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
+		audioData = new short[bufferSize];
+
+		getDecibel.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				getLastLocation();
+				if (!isRecording) {
+					startRecording();
+				} else {
+					stopRecording();
+				}
 			}
 		});
 	}
@@ -99,11 +126,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 					if (location == null) {
 						requestNewLocationData();
 					} else {
+						// blue moving marker
 						mMap.setMyLocationEnabled(true);
 
 						currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 						mMap.clear();
-						mMap.addMarker(new MarkerOptions().position(currentLocation));
+
+						// red fixed marker
+						// mMap.addMarker(new MarkerOptions().position(currentLocation));
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16F));
 					}
 				});
@@ -115,6 +145,56 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		} else {
 			requestPermissions();
 		}
+	}
+
+	private void startRecording() {
+		if (isMicrophonePermissionGranted()) {
+			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+				return;
+			}
+			audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+			audioRecord.startRecording();
+			isRecording = true;
+			Toast.makeText(this, "Recording...", Toast.LENGTH_SHORT).show();
+
+			// wait 1 sec before measuring
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			int amplitude = getAmplitude();
+			double db = 20 * Math.log10((double) amplitude);
+			displayDecibel(db);
+
+			stopRecording();
+		}
+	}
+
+
+	private void stopRecording() {
+		if (isRecording) {
+			isRecording = false;
+			audioRecord.stop();
+			audioRecord.release();
+		}
+	}
+
+	private int getAmplitude() {
+		audioRecord.read(audioData, 0, bufferSize);
+		int maxAmplitude = 0;
+		for (short s : audioData) {
+			if (Math.abs(s) > maxAmplitude) {
+				maxAmplitude = Math.abs(s);
+			}
+		}
+		return maxAmplitude;
+	}
+
+	private void displayDecibel(double db) {
+		String decibelText = String.format("Decibel Level: %.2f dB", db);
+		Toast.makeText(this, decibelText, Toast.LENGTH_SHORT).show();
 	}
 
 	// Get current location, if shifted
@@ -166,4 +246,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			getLastLocation();
 		}
 	}
+
+	private boolean isMicrophonePermissionGranted() {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+			return false;
+		}
+		return true;
+	}
+
+
 }
