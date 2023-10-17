@@ -14,11 +14,13 @@ import android.location.LocationManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -27,6 +29,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -57,9 +62,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	private MediaRecorder mediaRecorder;
 	private boolean isRecording = false;
 	private AudioRecord audioRecord;
-
 	private int bufferSize;
 	private short[] audioData;
+
+	// database
+
+	SoundDatabase database;
 
 
 	@Override
@@ -67,19 +75,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 
+
 		// get the API key
-		try {
+	/*	try {
 			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
 			String apiKey = ai.metaData.getString("com.google.android.geo.API_KEY");
 
 			// Initializing the Places API with the help of our API_KEY
-		/*
 			if (!Places.isInitialized()) {
 				Places.initialize(getApplicationContext(), apiKey);
-			}*/
+			}
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
 		}
+*/
+
 
 		// create map fragment
 		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -89,7 +99,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		// Initializing fused location client
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-		// button to
+		// button to get sound
 		Button getDecibel = findViewById(R.id.getDecibel);
 
 		bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
@@ -164,14 +174,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 				e.printStackTrace();
 			}
 
-			int amplitude = getAmplitude();
+			double amplitude = getAmplitude();
 			double db = 20 * Math.log10((double) amplitude);
 			displayDecibel(db);
-
 			stopRecording();
+			saveInDatabase(db);
 		}
 	}
 
+	private void saveInDatabase(double db) {
+
+		RoomDatabase.Callback callback = new RoomDatabase.Callback() {
+			@Override
+			public void onCreate(@NonNull SupportSQLiteDatabase db) {
+				super.onCreate(db);
+			}
+
+			@Override
+			public void onDestructiveMigration(@NonNull SupportSQLiteDatabase db) {
+				super.onDestructiveMigration(db);
+			}
+		};
+
+		database = Room.databaseBuilder(getApplicationContext(), SoundDatabase.class, "sound entry").addCallback(callback).build();
+
+		// async used because i cannot execute queries in the main app thread
+		AsyncTask.execute(() -> {
+			SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
+			try {
+				database.getSoundInterface().addEntry(soundEntry);
+			} catch (Exception e){
+				Log.e("Could add entry", String.valueOf(e));
+			}
+			database.close();
+		});
+	}
 
 	private void stopRecording() {
 		if (isRecording) {
@@ -181,9 +218,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		}
 	}
 
-	private int getAmplitude() {
+
+	private double getAmplitude() {
+		double maxAmplitude = 0;
+
 		audioRecord.read(audioData, 0, bufferSize);
-		int maxAmplitude = 0;
 		for (short s : audioData) {
 			if (Math.abs(s) > maxAmplitude) {
 				maxAmplitude = Math.abs(s);
@@ -201,8 +240,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	// from previous location
 	@SuppressLint("MissingPermission")
 	private void requestNewLocationData() {
-		LocationRequest locationRequest = LocationRequest.create()
-				.setWaitForAccurateLocation(true);
+		LocationRequest locationRequest = LocationRequest.create().setWaitForAccurateLocation(true);
 		locationRequest.setInterval(0);
 		locationRequest.setFastestInterval(0);
 		locationRequest.setNumUpdates(1);
@@ -230,8 +268,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	// Check if location permissions are granted to the application
 	private boolean checkPermissions() {
-		return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-				&& ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+		return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 	}
 
 	// Request permissions if not granted before
