@@ -33,16 +33,16 @@ public class MainActivity extends AppCompatActivity {
 
 			}
 		});
-
 		Button goToData = findViewById(R.id.data);
 
 		goToData.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, DataActivity.class);
+				Intent intent = new Intent(MainActivity.this, YourDataActivity.class);
 				startActivity(intent);
 
 			}
 		});
+
 	}
 }

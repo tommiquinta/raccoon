@@ -7,7 +7,6 @@ import android.content.Context;
 import com.google.android.gms.location.LocationRequest;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -16,8 +15,6 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
@@ -35,19 +32,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.Places;
-
-import java.io.IOException;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -64,12 +55,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	private AudioRecord audioRecord;
 	private int bufferSize;
 	private short[] audioData;
-
-	// database
-
-	SoundDatabase database;
-
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -183,33 +168,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	}
 
 	private void saveInDatabase(double db) {
+		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
+		Toast.makeText(this, soundEntry.toString(), Toast.LENGTH_SHORT).show();
 
-		RoomDatabase.Callback callback = new RoomDatabase.Callback() {
-			@Override
-			public void onCreate(@NonNull SupportSQLiteDatabase db) {
-				super.onCreate(db);
-			}
+		DatabaseHelper databaseHelper = new DatabaseHelper(MapActivity.this);
 
-			@Override
-			public void onDestructiveMigration(@NonNull SupportSQLiteDatabase db) {
-				super.onDestructiveMigration(db);
-			}
-		};
+		boolean success = databaseHelper.addEntry(soundEntry);
+		Toast.makeText(this, "Success: " + success, Toast.LENGTH_SHORT).show();
 
-		database = Room.databaseBuilder(getApplicationContext(), SoundDatabase.class, "sound entry").addCallback(callback).build();
-
-		// async used because i cannot execute queries in the main app thread
-		AsyncTask.execute(() -> {
-			SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
-			try {
-				database.getSoundInterface().addEntry(soundEntry);
-			} catch (Exception e){
-				Log.e("Could add entry", String.valueOf(e));
-			}
-			database.close();
-		});
 	}
-
 	private void stopRecording() {
 		if (isRecording) {
 			isRecording = false;

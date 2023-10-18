@@ -33,6 +33,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".YourDataActivity"
+            android:exported="false"
+            android:label="@string/your_data" />
 
         <!-- meta data per maps -->
         <meta-data
