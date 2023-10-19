@@ -10,20 +10,24 @@ public class SoundEntry {
 
 	double decibel;
 
-	public SoundEntry() {}
+	public SoundEntry() {
+	}
 
 	public SoundEntry(double latitude, double longitude, double decibel) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.decibel = decibel;
-		this.sound_id = 0;
 	}
 
 	public SoundEntry(int sound_id, double latitude, double longitude, double decibel) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.decibel = decibel;
-		this.sound_id = 0;
+		this.sound_id = sound_id;
+	}
+
+	public int getSound_id() {
+		return sound_id;
 	}
 
 	public double getLatitude() {
@@ -45,17 +49,17 @@ public class SoundEntry {
 	public double getDecibel() {
 		return decibel;
 	}
+
 	public void setDecibel(double decibel) {
 		this.decibel = decibel;
 	}
 
 	@Override
 	public String toString() {
-		return "SoundEntry{" +
-				"sound_id=" + sound_id +
-				", latitude=" + latitude +
-				", longitude=" + longitude +
-				", decibel=" + decibel +
-				'}';
+		return
+				"ID=" + sound_id +
+						", LAT=" + latitude +
+						", LONG=" + longitude +
+						", DB=" + decibel;
 	}
 }

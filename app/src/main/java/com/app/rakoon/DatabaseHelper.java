@@ -29,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	// called first time the db is accessed --> code to create an app
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String createTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + LATITUDE + " FLOAT, " + LONGITUDE + " FLOAT, " + DECIBEL + " FLOAT)";
+		String createTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + LATITUDE + " FLOAT, " + LONGITUDE + " FLOAT, " + DECIBEL + " FLOAT)";
 
 		db.execSQL(createTableStatement);
 	}
@@ -40,6 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	}
 
+	// INSERT A SOUND ENTRY
 	public boolean addEntry(@NonNull SoundEntry soundEntry) {
 		SQLiteDatabase db = this.getWritableDatabase(); // with WRITE, the db is locked. no other process can update  or write, creating a bottleneck
 		ContentValues cv = new ContentValues(); // hashmap
@@ -47,7 +48,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		cv.put(LATITUDE, soundEntry.getLatitude());
 		cv.put(LONGITUDE, soundEntry.getLongitude());
 		cv.put(DECIBEL, soundEntry.getDecibel());
-		// id is suto generated
 
 		long insert = db.insert(SOUND_DATA, null, cv);
 
@@ -58,6 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	// GET ALL SOUNDS ENTRIES
 	public List<SoundEntry> getSounds() {
 		List<SoundEntry> soundData = new ArrayList<>();
 		String query = "SELECT * FROM " + SOUND_DATA;
@@ -84,4 +85,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return soundData;
 	}
 
+
+	// DELETE ONE SOUND ENTRY
+	public boolean deleteOne(SoundEntry soundEntry) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "DELETE FROM " + SOUND_DATA + " WHERE  " + ID + "= " + soundEntry.getSound_id();
+
+		Cursor cursor = db.rawQuery(query, null);
+		if (cursor.moveToFirst()) {
+
+			return true;
+
+		} else {
+
+			return false;
+		}
+	}
 }

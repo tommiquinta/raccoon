@@ -168,6 +168,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	}
 
 	private void saveInDatabase(double db) {
+		db=Math.floor(db*100) / 100;
+
 		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
 		Toast.makeText(this, soundEntry.toString(), Toast.LENGTH_SHORT).show();
 

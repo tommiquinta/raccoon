@@ -10,14 +10,11 @@
         android:id="@+id/welcomeTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
-        android:text="Welcome to Raccoon!" />
+        android:layout_marginTop="92dp" />
 
     <ListView
         android:id="@+id/data_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-         />
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
