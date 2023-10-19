@@ -89,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	// DELETE ONE SOUND ENTRY
 	public boolean deleteOne(SoundEntry soundEntry) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String query = "DELETE FROM " + SOUND_DATA + " WHERE  " + ID + "= " + soundEntry.getSound_id();
+		String query = "DELETE FROM " + SOUND_DATA + " WHERE  " + ID + " = " + soundEntry.getSound_id();
 
 		Cursor cursor = db.rawQuery(query, null);
 		if (cursor.moveToFirst()) {

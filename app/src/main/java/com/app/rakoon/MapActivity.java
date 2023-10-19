@@ -7,6 +7,7 @@ import android.content.Context;
 import com.google.android.gms.location.LocationRequest;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -38,7 +39,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.android.libraries.places.api.Places;
+
+import mil.nga.mgrs.grid.GridType;
+import mil.nga.mgrs.grid.style.Grid;
+
+import mil.nga.mgrs.grid.style.Grids;
+import mil.nga.mgrs.tile.MGRSTileProvider;
+
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -55,6 +66,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	private AudioRecord audioRecord;
 	private int bufferSize;
 	private short[] audioData;
+
+	/**
+	 * MGRS tile provider
+	 */
+	private MGRSTileProvider tileProvider = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,13 +90,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
 		}
-*/
+
+	 */
+
 
 
 		// create map fragment
 		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 		assert mapFragment != null;
 		mapFragment.getMapAsync(this);
+
+		// create map grid
+		Grids grids = Grids.create();
+		grids.setLabelMinZoom(GridType.TEN_METER, 3);
+		tileProvider = MGRSTileProvider.create(this, grids);
 
 		// Initializing fused location client
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -108,6 +132,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		mMap = googleMap;
 		mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
+		//mMap.setOnCameraIdleListener(this);
+		//mMap.setOnMapClickListener(this);
 		getLastLocation();
 	}
 
@@ -126,6 +152,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 						currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 						mMap.clear();
+						// add grid layer
+						mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
+
 
 						// red fixed marker
 						// mMap.addMarker(new MarkerOptions().position(currentLocation));
@@ -168,7 +197,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	}
 
 	private void saveInDatabase(double db) {
-		db=Math.floor(db*100) / 100;
+		db = Math.floor(db * 100) / 100;
 
 		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
 		Toast.makeText(this, soundEntry.toString(), Toast.LENGTH_SHORT).show();
@@ -179,6 +208,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		Toast.makeText(this, "Success: " + success, Toast.LENGTH_SHORT).show();
 
 	}
+
 	private void stopRecording() {
 		if (isRecording) {
 			isRecording = false;

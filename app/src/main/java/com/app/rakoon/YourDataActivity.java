@@ -23,7 +23,6 @@ public class YourDataActivity extends AppCompatActivity {
 		DatabaseHelper databaseHelper = new DatabaseHelper(YourDataActivity.this);
 		updateView();
 
-
 		data_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long l) {
