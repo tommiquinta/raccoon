@@ -9,6 +9,7 @@ import com.google.android.gms.location.LocationRequest;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioFormat;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.libraries.places.api.Places;
 
+import mil.nga.color.Color;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.style.Grid;
 
@@ -102,7 +104,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		// create map grid
 		Grids grids = Grids.create();
-		grids.setLabelMinZoom(GridType.TEN_METER, 3);
+		grids.setWidth(GridType.TEN_METER, 1.0);
+		
 		tileProvider = MGRSTileProvider.create(this, grids);
 
 		// Initializing fused location client
@@ -158,7 +161,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 						// red fixed marker
 						// mMap.addMarker(new MarkerOptions().position(currentLocation));
-						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16F));
+
+						// PREFERENCES FRO 10 METERS SQUARES GRID --> is there a better way to do this?
+						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18F));
+						mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
+						mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
+
 					}
 				});
 			} else {
