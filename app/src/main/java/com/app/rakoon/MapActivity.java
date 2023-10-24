@@ -42,6 +42,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
@@ -189,20 +190,28 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 						// i don't know why but this LanLong has to be inverted
 						MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
+						String mgrs_1 = mgrs.toString();
+						String sw = mgrs_1.substring(0, 9)+""+mgrs_1.substring(10, 14);
+						Toast.makeText(this, "MGRS angle: " + sw, Toast.LENGTH_SHORT).show();
+
+						//String sw = "32tpq 8689 2974" ;
+						// now mgrs is the location point in MGRS coord, i have to find the corresponding square
+
+						//Toast.makeText(this, "MGRS point: " + mgrs.toString(), Toast.LENGTH_SHORT).show();
+
 
 						/**
 						 * TEST CODE TO DELETE
 						 */
 						try {
-							Point sw = MGRS.parse("32tpq 87181 29673").toPoint();
+							Point sw_point = MGRS.parse(sw).toPoint();
+							 mMap.addMarker(new MarkerOptions().position(new LatLng(sw_point.getLatitude(), sw_point.getLongitude())));
+
+							 /*
 							Point nw = MGRS.parse("32tpq 87191 29681").toPoint();
 							Point se = MGRS.parse("32tpq 87192 29683").toPoint();
 							Point ne = MGRS.parse("32tpq 87192 29684").toPoint();
-							/**
-							 the problem is that i have to get the zone, while MGRS.from creates  apoint where the user precisily is
-							 */
-							// here we get the corresponiding square
-							Toast.makeText(this, "MGRS easting: " + mgrs.getEasting(), Toast.LENGTH_SHORT).show();
+
 							List<LatLng> vertices = new ArrayList<>();
 
 							// Aggiungi le coordinate dei vertici del quadrato
@@ -217,6 +226,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 							// Aggiungi il rettangolo alla mappa
 							mMap.addPolygon(rectOptions);
+
+							*/
 						} catch (ParseException e) {
 							throw new RuntimeException(e);
 						}
