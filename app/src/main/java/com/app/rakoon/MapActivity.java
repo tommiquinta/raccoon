@@ -46,13 +46,18 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.libraries.places.api.Places;
 
 import mil.nga.color.Color;
+import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.style.Grid;
 
 import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
 
-
+/* LIST TO COLOR MAP:
+	1. convert latitude and longitude coordinates to the corresponding MGRS square => done, missing handling differnet squares size
+	2. get the for angles of the MGRS squares in the LatLong format
+	3. create a heatmap specifying the 4 angles
+*/
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 	private final int PERMISSION_ID = 42;
@@ -102,9 +107,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		assert mapFragment != null;
 		mapFragment.getMapAsync(this);
 
+
 		// create map grid
 		Grids grids = Grids.create();
 		grids.setWidth(GridType.TEN_METER, 1.0);
+		grids. enableLabeler(GridType.TEN_METER);
 		
 		tileProvider = MGRSTileProvider.create(this, grids);
 
@@ -206,6 +213,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	private void saveInDatabase(double db) {
 		db = Math.floor(db * 100) / 100;
+
+		// i don't know why but this LanLong has to be inverted
+		MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
+
+		// TEST CODE,TO DELETE:
+
+		// here we get the corresponiding square
+		Toast.makeText(this, "MGRS easting: " + mgrs.getEasting(), Toast.LENGTH_SHORT).show();
 
 		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
 		Toast.makeText(this, soundEntry.toString(), Toast.LENGTH_SHORT).show();
