@@ -42,16 +42,24 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.libraries.places.api.Places;
 
-import mil.nga.color.Color;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.style.Grid;
 
 import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
+
+import android.graphics.Color;
 
 /* LIST TO COLOR MAP:
 	1. convert latitude and longitude coordinates to the corresponding MGRS square => done, missing handling differnet squares size
@@ -101,7 +109,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	 */
 
 
-
 		// create map fragment
 		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 		assert mapFragment != null;
@@ -111,8 +118,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		// create map grid
 		Grids grids = Grids.create();
 		grids.setWidth(GridType.TEN_METER, 1.0);
-		grids. enableLabeler(GridType.TEN_METER);
-		
+		grids.enableLabeler(GridType.TEN_METER);
+
 		tileProvider = MGRSTileProvider.create(this, grids);
 
 		// Initializing fused location client
@@ -128,7 +135,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			@Override
 			public void onClick(View v) {
 				if (!isRecording) {
-					startRecording();
+					try {
+						startRecording();
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
 				} else {
 					stopRecording();
 				}
@@ -174,6 +185,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 						mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
 						mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
 
+						// ADD HEATMAP TEST
+
+						// i don't know why but this LanLong has to be inverted
+						MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
+
+						/**
+						 * TEST CODE TO DELETE
+						 */
+						try {
+							Point sw = MGRS.parse("32tpq 87181 29673").toPoint();
+							Point nw = MGRS.parse("32tpq 87191 29681").toPoint();
+							Point se = MGRS.parse("32tpq 87192 29683").toPoint();
+							Point ne = MGRS.parse("32tpq 87192 29684").toPoint();
+							/**
+							 the problem is that i have to get the zone, while MGRS.from creates  apoint where the user precisily is
+							 */
+							// here we get the corresponiding square
+							Toast.makeText(this, "MGRS easting: " + mgrs.getEasting(), Toast.LENGTH_SHORT).show();
+							List<LatLng> vertices = new ArrayList<>();
+
+							// Aggiungi le coordinate dei vertici del quadrato
+							vertices.add(new LatLng(sw.getLatitude(), sw.getLongitude()));
+							vertices.add(new LatLng(nw.getLatitude(), nw.getLongitude()));
+							vertices.add(new LatLng(se.getLatitude(), se.getLongitude()));
+							vertices.add(new LatLng(ne.getLatitude(), ne.getLongitude()));
+
+							// Crea un oggetto PolygonOptions e aggiungi i vertici
+							PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // Colore del bordo
+									.fillColor(Color.argb(100, 255, 0, 0)); // Utilizza Color.RED anche qui, o qualsiasi altro colore desiderato
+
+							// Aggiungi il rettangolo alla mappa
+							mMap.addPolygon(rectOptions);
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
 					}
 				});
 			} else {
@@ -186,7 +232,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		}
 	}
 
-	private void startRecording() {
+	private void startRecording() throws ParseException {
 		if (isMicrophonePermissionGranted()) {
 			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 				return;
@@ -211,16 +257,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		}
 	}
 
-	private void saveInDatabase(double db) {
+	private void saveInDatabase(double db) throws ParseException {
 		db = Math.floor(db * 100) / 100;
-
-		// i don't know why but this LanLong has to be inverted
-		MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
-
-		// TEST CODE,TO DELETE:
-
-		// here we get the corresponiding square
-		Toast.makeText(this, "MGRS easting: " + mgrs.getEasting(), Toast.LENGTH_SHORT).show();
 
 		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
 		Toast.makeText(this, soundEntry.toString(), Toast.LENGTH_SHORT).show();
