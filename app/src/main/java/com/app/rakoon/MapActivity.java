@@ -126,6 +126,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		// Initializing fused location client
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+		// Initializing vertices helper
+		VerticesHelper verticesHelper = new VerticesHelper();
+
 		// button to get sound
 		Button getDecibel = findViewById(R.id.getDecibel);
 
@@ -191,13 +194,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 						// i don't know why but this LanLong has to be inverted
 						MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
 						String mgrs_1 = mgrs.toString();
-						String sw = mgrs_1.substring(0, 9)+""+mgrs_1.substring(10, 14);
+
+						// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
+						String sw = mgrs_1.substring(0, 9) + "" + mgrs_1.substring(10, 14);
 						Toast.makeText(this, "MGRS angle: " + sw, Toast.LENGTH_SHORT).show();
 
 						//String sw = "32tpq 8689 2974" ;
 						// now mgrs is the location point in MGRS coord, i have to find the corresponding square
 
 						//Toast.makeText(this, "MGRS point: " + mgrs.toString(), Toast.LENGTH_SHORT).show();
+						VerticesHelper verticesHelper = new VerticesHelper();
+						verticesHelper.setBottom_left(sw);
+
+						Toast.makeText(this, "SW point: " + sw.toString(), Toast.LENGTH_SHORT).show();
+
+
+						// bottom right corner
+						String se = verticesHelper.getBottom_right();
+						Toast.makeText(this, "SE point: " + se.toString(), Toast.LENGTH_SHORT).show();
+
+
+						// top left corner
+						String nw = verticesHelper.getTop_keft();
+
+						// top right corner
+						//String ne = verticesHelper.getTop_right();
 
 
 						/**
@@ -205,20 +226,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 						 */
 						try {
 							Point sw_point = MGRS.parse(sw).toPoint();
-							 mMap.addMarker(new MarkerOptions().position(new LatLng(sw_point.getLatitude(), sw_point.getLongitude())));
 
-							 /*
-							Point nw = MGRS.parse("32tpq 87191 29681").toPoint();
-							Point se = MGRS.parse("32tpq 87192 29683").toPoint();
-							Point ne = MGRS.parse("32tpq 87192 29684").toPoint();
+							Point se_point = MGRS.parse(se).toPoint();
+
+							Point nw_point = MGRS.parse(nw).toPoint();
+
+							//Point ne_point = MGRS.parse(ne).toPoint();
+
 
 							List<LatLng> vertices = new ArrayList<>();
 
 							// Aggiungi le coordinate dei vertici del quadrato
-							vertices.add(new LatLng(sw.getLatitude(), sw.getLongitude()));
-							vertices.add(new LatLng(nw.getLatitude(), nw.getLongitude()));
-							vertices.add(new LatLng(se.getLatitude(), se.getLongitude()));
-							vertices.add(new LatLng(ne.getLatitude(), ne.getLongitude()));
+							vertices.add(new LatLng(nw_point.getLatitude(), nw_point.getLongitude()));
+							vertices.add(new LatLng(sw_point.getLatitude(), sw_point.getLongitude()));
+							//vertices.add(new LatLng(ne_point.getLatitude(), ne_point.getLongitude()));
+							vertices.add(new LatLng(se_point.getLatitude(), se_point.getLongitude()));
 
 							// Crea un oggetto PolygonOptions e aggiungi i vertici
 							PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // Colore del bordo
@@ -227,7 +249,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 							// Aggiungi il rettangolo alla mappa
 							mMap.addPolygon(rectOptions);
 
-							*/
+
 						} catch (ParseException e) {
 							throw new RuntimeException(e);
 						}
