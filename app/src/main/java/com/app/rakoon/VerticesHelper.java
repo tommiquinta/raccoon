@@ -19,7 +19,7 @@ public class VerticesHelper {
 	public String getBottom_right() {
 		char col = bottom_left.charAt(8);
 		int col_int = Integer.parseInt(String.valueOf(col));
-		int new_col = col_int - 1;
+		int new_col = col_int + 1;
 
 		if (new_col == 10) {
 			bottom_right = bottom_left.substring(0, 7) + new_col + bottom_left.substring(9, 13);
@@ -44,7 +44,7 @@ public class VerticesHelper {
 	public String getTop_right() {
 		char col = bottom_left.charAt(8);
 		int col_int = Integer.parseInt(String.valueOf(col));
-		int new_col = col_int - 1;
+		int new_col = col_int + 1;
 
 		char row = bottom_left.charAt(12);
 		int row_int = Integer.parseInt(String.valueOf(row));
@@ -52,10 +52,11 @@ public class VerticesHelper {
 
 
 		if (new_col == 10) {
-			bottom_right = bottom_left.substring(0, 7) + new_col + bottom_left.substring(9, 12) + new_row;
+			top_right = bottom_left.substring(0, 7) + new_col + bottom_left.substring(9, 12) + new_row;
 		} else {
-			bottom_right = bottom_left.substring(0, 8) + new_col + bottom_left.substring(9, 12)+ new_row;
-		}		return top_right;
+			top_right = bottom_left.substring(0, 8) + new_col + bottom_left.substring(9, 12) + new_row;
+		}
+		return top_right;
 	}
 
 	private String bottom_right;

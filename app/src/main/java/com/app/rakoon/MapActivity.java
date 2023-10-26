@@ -155,7 +155,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		mMap = googleMap;
-		mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+		mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
 		//mMap.setOnCameraIdleListener(this);
 		//mMap.setOnMapClickListener(this);
@@ -197,7 +197,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 						// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 						String sw = mgrs_1.substring(0, 9) + "" + mgrs_1.substring(10, 14);
-						Toast.makeText(this, "MGRS angle: " + sw, Toast.LENGTH_SHORT).show();
+					//	Toast.makeText(this, "MGRS angle: " + sw, Toast.LENGTH_SHORT).show();
 
 						//String sw = "32tpq 8689 2974" ;
 						// now mgrs is the location point in MGRS coord, i have to find the corresponding square
@@ -206,19 +206,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 						VerticesHelper verticesHelper = new VerticesHelper();
 						verticesHelper.setBottom_left(sw);
 
-						Toast.makeText(this, "SW point: " + sw.toString(), Toast.LENGTH_SHORT).show();
-
-
 						// bottom right corner
 						String se = verticesHelper.getBottom_right();
-						Toast.makeText(this, "SE point: " + se.toString(), Toast.LENGTH_SHORT).show();
 
 
 						// top left corner
 						String nw = verticesHelper.getTop_keft();
 
 						// top right corner
-						//String ne = verticesHelper.getTop_right();
+						String ne = verticesHelper.getTop_right();
+						Toast.makeText(this, "NE point: " + ne, Toast.LENGTH_SHORT).show();
+
 
 
 						/**
@@ -231,16 +229,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 							Point nw_point = MGRS.parse(nw).toPoint();
 
-							//Point ne_point = MGRS.parse(ne).toPoint();
-
+							Point ne_point = MGRS.parse(ne).toPoint();
 
 							List<LatLng> vertices = new ArrayList<>();
 
 							// Aggiungi le coordinate dei vertici del quadrato
 							vertices.add(new LatLng(nw_point.getLatitude(), nw_point.getLongitude()));
 							vertices.add(new LatLng(sw_point.getLatitude(), sw_point.getLongitude()));
-							//vertices.add(new LatLng(ne_point.getLatitude(), ne_point.getLongitude()));
 							vertices.add(new LatLng(se_point.getLatitude(), se_point.getLongitude()));
+							vertices.add(new LatLng(ne_point.getLatitude(), ne_point.getLongitude()));
 
 							// Crea un oggetto PolygonOptions e aggiungi i vertici
 							PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // Colore del bordo
