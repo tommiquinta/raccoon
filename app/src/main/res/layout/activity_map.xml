@@ -13,13 +13,21 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-    <Button
+    <!-- record sound button -->
+
+    <ImageButton
         android:id="@+id/getDecibel"
-        android:layout_width="50sp"
-        android:layout_height="50sp"
-        android:layout_alignParentTop="true"
+
+        android:layout_width="65sp"
+        android:layout_height="65sp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="30sp"
-        android:layout_marginEnd="30sp" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="30sp"
+        android:layout_marginBottom="30sp"
+        android:background="@drawable/sound_icon_background"
+        android:src="@drawable/sound_icon_foreground" />
+
+
+    />
 
 </RelativeLayout>

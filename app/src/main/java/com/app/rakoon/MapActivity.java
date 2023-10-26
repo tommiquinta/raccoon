@@ -22,6 +22,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -64,8 +65,8 @@ import android.graphics.Color;
 
 /* LIST TO COLOR MAP:
 	1. convert latitude and longitude coordinates to the corresponding MGRS square => done, missing handling differnet squares size
-	2. get the for angles of the MGRS squares in the LatLong format
-	3. create a heatmap specifying the 4 angles
+	2. get the for angles of the MGRS squares in the LatLong format => done
+	3. create a heatmap specifying the 4 angles => done
 */
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -77,7 +78,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	private LatLng currentLocation;
 
 	// audio
-	private MediaRecorder mediaRecorder;
 	private boolean isRecording = false;
 	private AudioRecord audioRecord;
 	private int bufferSize;
@@ -121,32 +121,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		grids.setWidth(GridType.TEN_METER, 1.0);
 		grids.enableLabeler(GridType.TEN_METER);
 
+		// create the MGRS tile provider
 		tileProvider = MGRSTileProvider.create(this, grids);
 
 		// Initializing fused location client
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-		// Initializing vertices helper
-		VerticesHelper verticesHelper = new VerticesHelper();
-
-		// button to get sound
-		Button getDecibel = findViewById(R.id.getDecibel);
+		// button to record sound decibel
+		ImageButton getDecibel = findViewById(R.id.getDecibel);
 
 		bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
 		audioData = new short[bufferSize];
 
-		getDecibel.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (!isRecording) {
-					try {
-						startRecording();
-					} catch (ParseException e) {
-						throw new RuntimeException(e);
-					}
-				} else {
-					stopRecording();
+		getDecibel.setOnClickListener(v -> {
+			if (!isRecording) {
+				try {
+					startRecording();
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
 				}
+			} else {
+				stopRecording();
 			}
 		});
 	}
@@ -159,7 +154,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		//mMap.setOnCameraIdleListener(this);
 		//mMap.setOnMapClickListener(this);
+		fetchData();
 		getLastLocation();
+	}
+
+	private void fetchData() {
+
 	}
 
 	// Get current location
@@ -197,27 +197,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 						// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 						String sw = mgrs_1.substring(0, 9) + "" + mgrs_1.substring(10, 14);
-					//	Toast.makeText(this, "MGRS angle: " + sw, Toast.LENGTH_SHORT).show();
 
-						//String sw = "32tpq 8689 2974" ;
 						// now mgrs is the location point in MGRS coord, i have to find the corresponding square
 
-						//Toast.makeText(this, "MGRS point: " + mgrs.toString(), Toast.LENGTH_SHORT).show();
 						VerticesHelper verticesHelper = new VerticesHelper();
 						verticesHelper.setBottom_left(sw);
 
 						// bottom right corner
 						String se = verticesHelper.getBottom_right();
 
-
 						// top left corner
 						String nw = verticesHelper.getTop_keft();
 
 						// top right corner
 						String ne = verticesHelper.getTop_right();
-						Toast.makeText(this, "NE point: " + ne, Toast.LENGTH_SHORT).show();
-
-
 
 						/**
 						 * TEST CODE TO DELETE
@@ -233,19 +226,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 							List<LatLng> vertices = new ArrayList<>();
 
-							// Aggiungi le coordinate dei vertici del quadrato
+							// polygons vertices latlong
 							vertices.add(new LatLng(nw_point.getLatitude(), nw_point.getLongitude()));
 							vertices.add(new LatLng(sw_point.getLatitude(), sw_point.getLongitude()));
 							vertices.add(new LatLng(se_point.getLatitude(), se_point.getLongitude()));
 							vertices.add(new LatLng(ne_point.getLatitude(), ne_point.getLongitude()));
 
-							// Crea un oggetto PolygonOptions e aggiungi i vertici
 							PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // Colore del bordo
 									.fillColor(Color.argb(100, 255, 0, 0)); // Utilizza Color.RED anche qui, o qualsiasi altro colore desiderato
 
-							// Aggiungi il rettangolo alla mappa
 							mMap.addPolygon(rectOptions);
-
 
 						} catch (ParseException e) {
 							throw new RuntimeException(e);
