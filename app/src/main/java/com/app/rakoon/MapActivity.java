@@ -83,6 +83,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	private int bufferSize;
 	private short[] audioData;
 
+	private DatabaseHelper databaseHelper;
+
 	/**
 	 * MGRS tile provider
 	 */
@@ -92,6 +94,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
+
+		// initialize database DAO
+		databaseHelper = new DatabaseHelper(MapActivity.this);
 
 
 		// get the API key
@@ -154,11 +159,69 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		//mMap.setOnCameraIdleListener(this);
 		//mMap.setOnMapClickListener(this);
-		fetchData();
 		getLastLocation();
+		fetchData();
 	}
 
 	private void fetchData() {
+		List<SoundEntry> sounds = databaseHelper.getSounds();
+		mMap.clear();
+		for (SoundEntry s : sounds) {
+			colorMap(s);
+		}
+
+	}
+
+	private void colorMap(@NonNull SoundEntry s) {
+
+
+		MGRS mgrs = MGRS.from(s.getLongitude(), s.getLatitude());
+
+		String mgrs_1 = mgrs.toString();
+
+		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
+		String sw = mgrs_1.substring(0, 9) + "" + mgrs_1.substring(10, 14);
+		//Log.d("sw: ", sw.toString());
+
+		// now mgrs is the location point in MGRS coord, i have to find the corresponding square
+		VerticesHelper verticesHelper = new VerticesHelper();
+		verticesHelper.setBottom_left(sw);
+
+		// bottom right corner
+		String se = verticesHelper.getBottom_right();
+
+		// top left corner
+		String nw = verticesHelper.getTop_left();
+
+		// top right corner
+		String ne = verticesHelper.getTop_right();
+
+		try {
+			Point sw_point = MGRS.parse(sw).toPoint();
+
+			Point se_point = MGRS.parse(se).toPoint();
+
+			Point nw_point = MGRS.parse(nw).toPoint();
+
+			Point ne_point = MGRS.parse(ne).toPoint();
+
+			List<LatLng> vertices = new ArrayList<>();
+
+			// polygons vertices latlong
+			vertices.add(new LatLng(nw_point.getLatitude(), nw_point.getLongitude()));
+			vertices.add(new LatLng(sw_point.getLatitude(), sw_point.getLongitude()));
+			vertices.add(new LatLng(se_point.getLatitude(), se_point.getLongitude()));
+			vertices.add(new LatLng(ne_point.getLatitude(), ne_point.getLongitude()));
+
+			PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // border color
+					.fillColor(Color.argb(100, 255, 0, 0));
+
+			mMap.addPolygon(rectOptions);
+
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+
 
 	}
 
@@ -176,7 +239,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 						mMap.setMyLocationEnabled(true);
 
 						currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-						mMap.clear();
 						// add grid layer
 						mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
 
@@ -188,58 +250,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18F));
 						mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
 						mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
-
-						// ADD HEATMAP TEST
-
-						// i don't know why but this LanLong has to be inverted
-						MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
-						String mgrs_1 = mgrs.toString();
-
-						// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
-						String sw = mgrs_1.substring(0, 9) + "" + mgrs_1.substring(10, 14);
-
-						// now mgrs is the location point in MGRS coord, i have to find the corresponding square
-
-						VerticesHelper verticesHelper = new VerticesHelper();
-						verticesHelper.setBottom_left(sw);
-
-						// bottom right corner
-						String se = verticesHelper.getBottom_right();
-
-						// top left corner
-						String nw = verticesHelper.getTop_keft();
-
-						// top right corner
-						String ne = verticesHelper.getTop_right();
-
-						/**
-						 * TEST CODE TO DELETE
-						 */
-						try {
-							Point sw_point = MGRS.parse(sw).toPoint();
-
-							Point se_point = MGRS.parse(se).toPoint();
-
-							Point nw_point = MGRS.parse(nw).toPoint();
-
-							Point ne_point = MGRS.parse(ne).toPoint();
-
-							List<LatLng> vertices = new ArrayList<>();
-
-							// polygons vertices latlong
-							vertices.add(new LatLng(nw_point.getLatitude(), nw_point.getLongitude()));
-							vertices.add(new LatLng(sw_point.getLatitude(), sw_point.getLongitude()));
-							vertices.add(new LatLng(se_point.getLatitude(), se_point.getLongitude()));
-							vertices.add(new LatLng(ne_point.getLatitude(), ne_point.getLongitude()));
-
-							PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // Colore del bordo
-									.fillColor(Color.argb(100, 255, 0, 0)); // Utilizza Color.RED anche qui, o qualsiasi altro colore desiderato
-
-							mMap.addPolygon(rectOptions);
-
-						} catch (ParseException e) {
-							throw new RuntimeException(e);
-						}
 					}
 				});
 			} else {
@@ -281,12 +291,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		db = Math.floor(db * 100) / 100;
 
 		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
-		Toast.makeText(this, soundEntry.toString(), Toast.LENGTH_SHORT).show();
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(MapActivity.this);
 
 		boolean success = databaseHelper.addEntry(soundEntry);
-		Toast.makeText(this, "Success: " + success, Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Success: " + success, Toast.LENGTH_SHORT).show();
 
 	}
 

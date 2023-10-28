@@ -27,7 +27,7 @@ public class SoundEntry {
 	}
 
 	public int getSound_id() {
-		return sound_id;
+		return this.sound_id;
 	}
 
 	public double getLatitude() {
