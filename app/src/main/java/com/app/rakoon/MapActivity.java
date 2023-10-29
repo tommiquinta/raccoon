@@ -174,7 +174,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	private void colorMap(@NonNull SoundEntry s) {
 
-
 		MGRS mgrs = MGRS.from(s.getLongitude(), s.getLatitude());
 
 		String mgrs_1 = mgrs.toString();
@@ -248,7 +247,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 						// PREFERENCES FRO 10 METERS SQUARES GRID --> is there a better way to do this?
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18F));
-						mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
+						//mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
 						mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
 					}
 				});

@@ -19,4 +19,5 @@
     <string name="my_map_api_key">AIzaSyA97Ku4ag32kmZ5yLlFzLz4ot2icXIHvx4</string>
     <string name="welcome_to_raccoon">Welcome to Raccoon!</string>
     <string name="data_size_message" />
+    <string name="settings">your settings</string>
 </resources>

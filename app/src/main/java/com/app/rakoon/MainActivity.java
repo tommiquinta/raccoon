@@ -1,16 +1,11 @@
 package com.app.rakoon;
 // MainActivity.java
 
-import android.content.Context;
 import android.content.Intent;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.gms.location.LocationRequest;
 
 //import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,27 +16,37 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// Trova il riferimento al bottone
+		/**
+		 * sound map activity
+		 */
 		Button btnGoToSoundActivity = findViewById(R.id.createSoundMapButton);
 
-		// Aggiungi il listener per il click del bottone
-		btnGoToSoundActivity.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, MapActivity.class);
-				startActivity(intent);
+		btnGoToSoundActivity.setOnClickListener(v -> {
+			Intent intent = new Intent(MainActivity.this, MapActivity.class);
+			startActivity(intent);
 
-			}
 		});
+
+		/**
+		 * data activity
+		 */
+
 		Button goToData = findViewById(R.id.data);
 
-		goToData.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, YourDataActivity.class);
-				startActivity(intent);
+		goToData.setOnClickListener(v -> {
+			Intent intent = new Intent(MainActivity.this, YourDataActivity.class);
+			startActivity(intent);
+		});
 
-			}
+		/**
+		 * settings activity
+		 */
+
+		Button goToSettings = findViewById(R.id.settings);
+
+		goToSettings.setOnClickListener(v -> {
+			Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+			startActivity(intent);
 		});
 
 	}
