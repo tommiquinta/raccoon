@@ -49,8 +49,11 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.libraries.places.api.Places;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import mil.nga.grid.features.Point;
@@ -220,8 +223,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}
-
-
 	}
 
 	// Get current location
@@ -287,14 +288,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	}
 
 	private void saveInDatabase(double db) throws ParseException {
-		db = Math.floor(db * 100) / 100;
+		double decibel = Math.floor(db * 100) / 100;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
+		String time = sdf.format(new Date());
 
-		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, db);
+
+		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, decibel, time);
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(MapActivity.this);
 
+		colorMap(soundEntry);
+
 		boolean success = databaseHelper.addEntry(soundEntry);
 		//Toast.makeText(this, "Success: " + success, Toast.LENGTH_SHORT).show();
+
 
 	}
 

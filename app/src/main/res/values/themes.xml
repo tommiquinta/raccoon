@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Rakoon" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.Raccoon" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryDark">@color/purple_700</item>
@@ -8,7 +8,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.Rakoon.NoActionBar">
+    <style name="Theme.Raccoon.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

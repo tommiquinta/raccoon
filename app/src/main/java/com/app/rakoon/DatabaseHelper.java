@@ -6,10 +6,13 @@ import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,16 +23,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public static final String LATITUDE = "LATITUDE";
 	public static final String LONGITUDE = "LONGITUDE";
 	public static final String DECIBEL = "DECIBEL";
+
+	public static final String TIME = "TIME";
 	public static final String ID = "ID";
 
 	public DatabaseHelper(@Nullable Context context) {
-		super(context, "user_data.db", null, 1);
+		super(context, "user_data.db", null, 2);
 	}
 
 	// called first time the db is accessed --> code to create an app
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String createTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + LATITUDE + " FLOAT, " + LONGITUDE + " FLOAT, " + DECIBEL + " FLOAT)";
+		String createTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + LATITUDE + " FLOAT, " + LONGITUDE + " FLOAT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
 
 		db.execSQL(createTableStatement);
 	}
@@ -48,6 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		cv.put(LATITUDE, soundEntry.getLatitude());
 		cv.put(LONGITUDE, soundEntry.getLongitude());
 		cv.put(DECIBEL, soundEntry.getDecibel());
+		cv.put(TIME, soundEntry.getTime());
 
 		long insert = db.insert(SOUND_DATA, null, cv);
 
@@ -73,8 +79,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				double latitude = cursor.getDouble(1);
 				double longitude = cursor.getDouble(2);
 				double decibel = cursor.getDouble(3);
+				String time = cursor.getString(4);
+				Log.d("time: ", time.toString());
 
-				SoundEntry se = new SoundEntry(id, latitude, longitude, decibel);
+
+				SoundEntry se = new SoundEntry(id, latitude, longitude, decibel, time);
 				soundData.add(se);
 			} while (cursor.moveToNext());  // proceed to the db one at a time
 		} else {

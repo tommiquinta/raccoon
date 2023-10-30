@@ -1,6 +1,12 @@
 package com.app.rakoon;
 
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class SoundEntry {
 	int sound_id;
 
@@ -10,20 +16,26 @@ public class SoundEntry {
 
 	double decibel;
 
+	SimpleDateFormat time;
+
+	String timeString;
+
 	public SoundEntry() {
 	}
 
-	public SoundEntry(double latitude, double longitude, double decibel) {
+	public SoundEntry(double latitude, double longitude, double decibel, String timeString) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.decibel = decibel;
+		this.timeString = timeString;
 	}
 
-	public SoundEntry(int sound_id, double latitude, double longitude, double decibel) {
+	public SoundEntry(int sound_id, double latitude, double longitude, double decibel, String timeString) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.decibel = decibel;
 		this.sound_id = sound_id;
+		this.timeString = timeString;
 	}
 
 	public int getSound_id() {
@@ -54,12 +66,21 @@ public class SoundEntry {
 		this.decibel = decibel;
 	}
 
+	public String getTime() {
+		return timeString;
+	}
+
+	public void setTime(SimpleDateFormat time) {
+		this.time = time;
+	}
+
 	@Override
 	public String toString() {
 		return
 				"ID=" + sound_id +
 						", LAT=" + latitude +
 						", LONG=" + longitude +
-						", DB=" + decibel;
+						", DB=" + decibel +
+						", TIME= " + timeString;
 	}
 }
