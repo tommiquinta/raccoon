@@ -161,7 +161,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		mMap = googleMap;
 		mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-
 		//mMap.setOnCameraIdleListener(this);
 		//mMap.setOnMapClickListener(this);
 		getLastLocation();
@@ -170,6 +169,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	private void fetchData() {
 		List<SoundEntry> sounds = databaseHelper.getSounds();
+		Map<String, Double> averageDecibels = new HashMap<>();
+		averageDecibels = calculateDecibelAverages(sounds);
 
 		mMap.clear();
 		for (SoundEntry s : sounds) {
@@ -178,10 +179,43 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	}
 
+	public static Map<String, Double> calculateDecibelAverages(List<SoundEntry> soundEntries) {
+		Map<String, List<Double>> decibelMap = new HashMap<>();
+
+		for (SoundEntry entry : soundEntries) {
+
+			String MGRS = entry.MGRS;
+			// mgrs for 10 meter squares
+			String sw = MGRS.substring(0, 9) + "" + MGRS.substring(10, 14);
+
+			double decibel = entry.decibel;
+
+			if (!decibelMap.containsKey(sw)) {
+				decibelMap.put(sw, new ArrayList<>());
+			}
+
+			decibelMap.get(sw).add(decibel);
+		}
+
+		// Calculating the average decibel for each MGRS area
+		Map<String, Double> averageDecibels = new HashMap<>();
+		for (Map.Entry<String, List<Double>> entry : decibelMap.entrySet()) {
+			List<Double> decibelList = entry.getValue();
+			double sum = 0;
+			for (Double d : decibelList) {
+				sum += d;
+			}
+			double average = sum / decibelList.size();
+			averageDecibels.put(entry.getKey(), average);
+		}
+
+		return averageDecibels;
+	}
+
 	private void colorMap(@NonNull SoundEntry s) {
 
 		String mgrs_1 = s.getMGRS();
-		Toast.makeText(this, "mgrs: "+ mgrs_1, Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "mgrs: " + mgrs_1, Toast.LENGTH_LONG).show();
 
 
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
@@ -307,7 +341,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		boolean success = databaseHelper.addEntry(soundEntry);
 		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
-
 	}
 
 	private void stopRecording() {
