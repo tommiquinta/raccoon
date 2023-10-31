@@ -13,6 +13,7 @@ public class SoundEntry {
 	double latitude;
 
 	double longitude;
+	String MGRS;
 
 	double decibel;
 
@@ -23,9 +24,8 @@ public class SoundEntry {
 	public SoundEntry() {
 	}
 
-	public SoundEntry(double latitude, double longitude, double decibel, String timeString) {
-		this.latitude = latitude;
-		this.longitude = longitude;
+	public SoundEntry(String MGRS, double decibel, String timeString) {
+		this.MGRS = MGRS;
 		this.decibel = decibel;
 		this.timeString = timeString;
 	}
@@ -35,6 +35,13 @@ public class SoundEntry {
 		this.longitude = longitude;
 		this.decibel = decibel;
 		this.sound_id = sound_id;
+		this.timeString = timeString;
+	}
+
+	public SoundEntry(int sound_id, String MGRS, double decibel, String timeString) {
+		this.sound_id = sound_id;
+		this.MGRS = MGRS;
+		this.decibel = decibel;
 		this.timeString = timeString;
 	}
 
@@ -74,12 +81,19 @@ public class SoundEntry {
 		this.time = time;
 	}
 
+
+	public String getMGRS() {
+		return MGRS;
+	}
+
+	public void setMGRS(String MGRS) {
+		this.MGRS = MGRS;
+	}
 	@Override
 	public String toString() {
 		return
 				"ID=" + sound_id +
-						", LAT=" + latitude +
-						", LONG=" + longitude +
+						", MGRS=" + MGRS +
 						", DB=" + decibel +
 						", TIME= " + timeString;
 	}

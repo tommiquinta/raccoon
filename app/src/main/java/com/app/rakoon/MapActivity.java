@@ -54,7 +54,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
@@ -168,6 +170,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	private void fetchData() {
 		List<SoundEntry> sounds = databaseHelper.getSounds();
+
 		mMap.clear();
 		for (SoundEntry s : sounds) {
 			colorMap(s);
@@ -177,9 +180,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	private void colorMap(@NonNull SoundEntry s) {
 
-		MGRS mgrs = MGRS.from(s.getLongitude(), s.getLatitude());
+		String mgrs_1 = s.getMGRS();
+		Toast.makeText(this, "mgrs: "+ mgrs_1, Toast.LENGTH_LONG).show();
 
-		String mgrs_1 = mgrs.toString();
 
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 		String sw = mgrs_1.substring(0, 9) + "" + mgrs_1.substring(10, 14);
@@ -274,7 +277,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 			// wait 1 sec before measuring
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -287,21 +290,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		}
 	}
 
-	private void saveInDatabase(double db) throws ParseException {
+	private void saveInDatabase(double db) {
 		double decibel = Math.floor(db * 100) / 100;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
 		String time = sdf.format(new Date());
 
+		MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
 
-		SoundEntry soundEntry = new SoundEntry(currentLocation.latitude, currentLocation.longitude, decibel, time);
+		String mgrs_1 = mgrs.toString();
+
+		SoundEntry soundEntry = new SoundEntry(mgrs_1, decibel, time);
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(MapActivity.this);
 
 		colorMap(soundEntry);
 
 		boolean success = databaseHelper.addEntry(soundEntry);
-		//Toast.makeText(this, "Success: " + success, Toast.LENGTH_SHORT).show();
-
+		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 
 	}
 

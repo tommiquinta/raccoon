@@ -23,18 +23,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public static final String LATITUDE = "LATITUDE";
 	public static final String LONGITUDE = "LONGITUDE";
 	public static final String DECIBEL = "DECIBEL";
-
+	public static final String MGRS = "MGRS";
 	public static final String TIME = "TIME";
 	public static final String ID = "ID";
 
 	public DatabaseHelper(@Nullable Context context) {
-		super(context, "user_data.db", null, 2);
+		super(context, "user_data.db", null, 3);
 	}
 
 	// called first time the db is accessed --> code to create an app
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String createTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + LATITUDE + " FLOAT, " + LONGITUDE + " FLOAT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
+		String createTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " FLOAT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
 
 		db.execSQL(createTableStatement);
 	}
@@ -50,8 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase(); // with WRITE, the db is locked. no other process can update  or write, creating a bottleneck
 		ContentValues cv = new ContentValues(); // hashmap
 
-		cv.put(LATITUDE, soundEntry.getLatitude());
-		cv.put(LONGITUDE, soundEntry.getLongitude());
+		cv.put(MGRS, soundEntry.getMGRS());
 		cv.put(DECIBEL, soundEntry.getDecibel());
 		cv.put(TIME, soundEntry.getTime());
 
@@ -76,14 +75,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			// loop through the results and create a new object, then returning it to the list
 			do {
 				int id = cursor.getInt(0);
-				double latitude = cursor.getDouble(1);
-				double longitude = cursor.getDouble(2);
-				double decibel = cursor.getDouble(3);
-				String time = cursor.getString(4);
-				Log.d("time: ", time.toString());
+				String MGRS = cursor.getString(1);
+				double decibel = cursor.getDouble(2);
+				String time = cursor.getString(3);
 
-
-				SoundEntry se = new SoundEntry(id, latitude, longitude, decibel, time);
+				SoundEntry se = new SoundEntry(id, MGRS, decibel, time);
 				soundData.add(se);
 			} while (cursor.moveToNext());  // proceed to the db one at a time
 		} else {
