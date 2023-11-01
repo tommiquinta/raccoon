@@ -45,6 +45,11 @@ public class SoundEntry {
 		this.timeString = timeString;
 	}
 
+	public SoundEntry(String MGRS, Double decibel) {
+		this.MGRS = MGRS;
+		this.decibel = decibel;
+	}
+
 	public int getSound_id() {
 		return this.sound_id;
 	}
@@ -89,6 +94,7 @@ public class SoundEntry {
 	public void setMGRS(String MGRS) {
 		this.MGRS = MGRS;
 	}
+
 	@Override
 	public String toString() {
 		return

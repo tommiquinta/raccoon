@@ -169,12 +169,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	private void fetchData() {
 		List<SoundEntry> sounds = databaseHelper.getSounds();
-		Map<String, Double> averageDecibels = new HashMap<>();
+		Map<String, Double> averageDecibels;
 		averageDecibels = calculateDecibelAverages(sounds);
 
 		mMap.clear();
-		for (SoundEntry s : sounds) {
-			colorMap(s);
+		for (Map.Entry<String, Double> s : averageDecibels.entrySet()) {
+			SoundEntry se = new SoundEntry(s.getKey(), s.getValue());
+			colorMap(se);
 		}
 
 	}
@@ -214,12 +215,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 	private void colorMap(@NonNull SoundEntry s) {
 
-		String mgrs_1 = s.getMGRS();
-		Toast.makeText(this, "mgrs: " + mgrs_1, Toast.LENGTH_LONG).show();
-
-
+		String sw = s.getMGRS();
+		
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
-		String sw = mgrs_1.substring(0, 9) + "" + mgrs_1.substring(10, 14);
 		//Log.d("sw: ", sw.toString());
 
 		// now mgrs is the location point in MGRS coord, i have to find the corresponding square
