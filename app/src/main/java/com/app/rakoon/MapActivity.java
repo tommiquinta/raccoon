@@ -216,7 +216,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	private void colorMap(@NonNull SoundEntry s) {
 
 		String sw = s.getMGRS();
-		
+
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 		//Log.d("sw: ", sw.toString());
 
@@ -250,10 +250,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			vertices.add(new LatLng(se_point.getLatitude(), se_point.getLongitude()));
 			vertices.add(new LatLng(ne_point.getLatitude(), ne_point.getLongitude()));
 
-			PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // border color
-					.fillColor(Color.argb(100, 255, 0, 0));
+			/**
+			 * square with wide border
+			 * PolygonOptions rectOptions = new PolygonOptions().addAll(vertices).strokeColor(Color.RED) // border color
+			 * 					.fillColor(Color.argb(100, 0, 255, 155));
+			 */
 
-			mMap.addPolygon(rectOptions);
+
+			PolygonOptions poly = new PolygonOptions().addAll(vertices).strokeWidth(0);
+
+			// check the mean value to color the square
+			if(s.decibel <= 60){
+				poly.fillColor(Color.argb(100, 144,238,144));
+			} else if(s.decibel > 60 && s.decibel <= 90){
+				poly.fillColor(Color.argb(100, 255, 215, 0));
+			} else{
+				poly.fillColor(Color.argb(100, 255, 0, 0));
+			}
+
+
+			mMap.addPolygon(poly);
 
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
@@ -315,7 +331,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			}
 
 			double amplitude = getAmplitude();
-			double db = 20 * Math.log10((double) amplitude);
+			double db = 30 * Math.log10(amplitude);
 			displayDecibel(db);
 			stopRecording();
 			saveInDatabase(db);

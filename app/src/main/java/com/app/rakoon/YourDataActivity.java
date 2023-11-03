@@ -41,7 +41,7 @@ public class YourDataActivity extends AppCompatActivity {
 		DatabaseHelper databaseHelper = new DatabaseHelper(YourDataActivity.this);
 		List<SoundEntry> sounds = databaseHelper.getSounds();
 
-		Toast.makeText(this, "Size: " + sounds.size(), Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Size: " + sounds.size(), Toast.LENGTH_SHORT).show();
 
 		ArrayAdapter<SoundEntry> arrayAdapter = new ArrayAdapter<SoundEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
 		data_view.setAdapter(arrayAdapter);
