@@ -172,7 +172,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		Map<String, Double> averageDecibels;
 		averageDecibels = calculateDecibelAverages(sounds);
 
-		mMap.clear();
 		for (Map.Entry<String, Double> s : averageDecibels.entrySet()) {
 			SoundEntry se = new SoundEntry(s.getKey(), s.getValue());
 			colorMap(se);
@@ -194,7 +193,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			if (!decibelMap.containsKey(sw)) {
 				decibelMap.put(sw, new ArrayList<>());
 			}
-
 			decibelMap.get(sw).add(decibel);
 		}
 
@@ -256,19 +254,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			 * 					.fillColor(Color.argb(100, 0, 255, 155));
 			 */
 
-
 			PolygonOptions poly = new PolygonOptions().addAll(vertices).strokeWidth(0);
 
 			// check the mean value to color the square
 			if(s.decibel <= 60){
-				poly.fillColor(Color.argb(100, 144,238,144));
+				poly.fillColor(Color.rgb(144,238,144));
 			} else if(s.decibel > 60 && s.decibel <= 90){
-				poly.fillColor(Color.argb(100, 255, 215, 0));
+				poly.fillColor(Color.rgb(255, 215, 0));
 			} else{
-				poly.fillColor(Color.argb(100, 255, 0, 0));
+				poly.fillColor(Color.rgb(255, 0, 0));
 			}
-
-
 			mMap.addPolygon(poly);
 
 		} catch (ParseException e) {
@@ -351,11 +346,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(MapActivity.this);
 
-		colorMap(soundEntry);
-
 		boolean success = databaseHelper.addEntry(soundEntry);
+		if(success){
+			fetchData();
+		}
 		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 	}
+
+	private void updateSquare(SoundEntry soundEntry) {
+
+	}
+
 
 	private void stopRecording() {
 		if (isRecording) {
