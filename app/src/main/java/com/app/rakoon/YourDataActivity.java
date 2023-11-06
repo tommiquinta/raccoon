@@ -35,11 +35,11 @@ public class YourDataActivity extends AppCompatActivity {
 		data_view = findViewById(R.id.data_view);
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(YourDataActivity.this);
-		List<SignalEntry> sounds = databaseHelper.getSignals();
+		List<SoundEntry> sounds = databaseHelper.getSounds();
 
 		//Toast.makeText(this, "Size: " + sounds.size(), Toast.LENGTH_SHORT).show();
 
-		ArrayAdapter<SignalEntry> arrayAdapter = new ArrayAdapter<SignalEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
+		ArrayAdapter<SoundEntry> arrayAdapter = new ArrayAdapter<SoundEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
 		data_view.setAdapter(arrayAdapter);
 	}
 

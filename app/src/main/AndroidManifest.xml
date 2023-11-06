@@ -52,6 +52,12 @@
             android:exported="false"
             android:label="@string/settings" />
 
+        <activity
+            android:name=".MapActivity"
+            android:exported="false"
+            android:label="@string/settings" />
+
+
         <!-- meta data per maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
