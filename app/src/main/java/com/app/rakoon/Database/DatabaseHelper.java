@@ -1,18 +1,14 @@
-package com.app.rakoon;
+package com.app.rakoon.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,23 +16,25 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public static final String SOUND_DATA = "SOUND_DATA";
-	public static final String LATITUDE = "LATITUDE";
-	public static final String LONGITUDE = "LONGITUDE";
+	public static final String SIGNAL_DATA = "SIGNAL_DATA";
 	public static final String DECIBEL = "DECIBEL";
 	public static final String MGRS = "MGRS";
 	public static final String TIME = "TIME";
 	public static final String ID = "ID";
+	public static final String SIGNAL = "SIGNAL";
 
 	public DatabaseHelper(@Nullable Context context) {
-		super(context, "user_data.db", null, 3);
+		super(context, "user_data.db", null, 4);
 	}
 
 	// called first time the db is accessed --> code to create an app
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String createTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " FLOAT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
+		String createSoundTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " FLOAT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
+		String createSignalTableStatement = "CREATE TABLE " + SIGNAL_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " FLOAT, " + SIGNAL + " INTEGER, " + TIME + " TEXT)";
 
-		db.execSQL(createTableStatement);
+		db.execSQL(createSoundTableStatement);
+		db.execSQL(createSignalTableStatement);
 	}
 
 	// update the database if app gets updated, used for compatibility
@@ -46,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	// INSERT A SOUND ENTRY
-	public boolean addEntry(@NonNull SoundEntry soundEntry) {
+	public boolean addSoundEntry(@NonNull SoundEntry soundEntry) {
 		SQLiteDatabase db = this.getWritableDatabase(); // with WRITE, the db is locked. no other process can update  or write, creating a bottleneck
 		ContentValues cv = new ContentValues(); // hashmap
 
@@ -55,6 +53,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		cv.put(TIME, soundEntry.getTime());
 
 		long insert = db.insert(SOUND_DATA, null, cv);
+
+		if (insert == -1) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	public boolean addSignalEntry(@NonNull SignalEntry signalEntry) {
+		SQLiteDatabase db = this.getWritableDatabase(); // with WRITE, the db is locked. no other process can update  or write, creating a bottleneck
+		ContentValues cv = new ContentValues(); // hashmap
+
+		cv.put(MGRS, signalEntry.getMGRS());
+		cv.put(SIGNAL, signalEntry.getSignal());
+		cv.put(TIME, signalEntry.getTime());
+
+		long insert = db.insert(SIGNAL_DATA, null, cv);
 
 		if (insert == -1) {
 			return false;
@@ -90,19 +105,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return soundData;
 	}
 
-
 	// DELETE ONE SOUND ENTRY
 	public boolean deleteOne(SoundEntry soundEntry) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String query = "DELETE FROM " + SOUND_DATA + " WHERE  " + ID + " = " + soundEntry.getSound_id();
+		String query = "DELETE FROM " + SOUND_DATA + " WHERE  " + ID + " = " + soundEntry.getId();
 
 		Cursor cursor = db.rawQuery(query, null);
 		if (cursor.moveToFirst()) {
-
 			return true;
-
 		} else {
-
 			return false;
 		}
 	}

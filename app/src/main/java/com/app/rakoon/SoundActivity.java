@@ -4,24 +4,21 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import com.app.rakoon.Database.DatabaseHelper;
+import com.app.rakoon.Database.SoundEntry;
+import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.location.LocationRequest;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -29,9 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -41,15 +35,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.android.libraries.places.api.Places;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,19 +50,13 @@ import java.util.Map;
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.grid.GridType;
-import mil.nga.mgrs.grid.style.Grid;
 
 import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
 
 import android.graphics.Color;
 
-/* LIST TO COLOR MAP:
-	1. convert latitude and longitude coordinates to the corresponding MGRS square => done, missing handling differnet squares size
-	2. get the for angles of the MGRS squares in the LatLong format => done
-	3. create a heatmap specifying the 4 angles => done
-*/
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SoundActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 	private final int PERMISSION_ID = 42;
 	private FusedLocationProviderClient mFusedLocationClient;
@@ -101,7 +84,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		setContentView(R.layout.activity_map);
 
 		// initialize database DAO
-		databaseHelper = new DatabaseHelper(MapActivity.this);
+		databaseHelper = new DatabaseHelper(SoundActivity.this);
 
 
 		// get the API key
@@ -183,12 +166,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		Map<String, List<Double>> decibelMap = new HashMap<>();
 
 		for (SoundEntry entry : soundEntries) {
-
-			String MGRS = entry.MGRS;
+			String MGRS = entry.getMGRS();
 			// mgrs for 10 meter squares
 			String sw = MGRS.substring(0, 9) + "" + MGRS.substring(10, 14);
 
-			double decibel = entry.decibel;
+			double decibel = entry.getDecibel();
 
 			if (!decibelMap.containsKey(sw)) {
 				decibelMap.put(sw, new ArrayList<>());
@@ -257,9 +239,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			PolygonOptions poly = new PolygonOptions().addAll(vertices).strokeWidth(0);
 
 			// check the mean value to color the square
-			if(s.decibel <= 60){
+			if(s.getDecibel() <= 60){
 				poly.fillColor(Color.rgb(144,238,144));
-			} else if(s.decibel > 60 && s.decibel <= 90){
+			} else if(s.getDecibel() > 60 && s.getDecibel() <= 90){
 				poly.fillColor(Color.rgb(255, 215, 0));
 			} else{
 				poly.fillColor(Color.rgb(255, 0, 0));
@@ -344,19 +326,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		SoundEntry soundEntry = new SoundEntry(mgrs_1, decibel, time);
 
-		DatabaseHelper databaseHelper = new DatabaseHelper(MapActivity.this);
+		DatabaseHelper databaseHelper = new DatabaseHelper(SoundActivity.this);
 
-		boolean success = databaseHelper.addEntry(soundEntry);
+		boolean success = databaseHelper.addSoundEntry(soundEntry);
+		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 		if(success){
 			fetchData();
 		}
-		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 	}
-
-	private void updateSquare(SoundEntry soundEntry) {
-
-	}
-
 
 	private void stopRecording() {
 		if (isRecording) {

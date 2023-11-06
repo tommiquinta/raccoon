@@ -1,14 +1,14 @@
 package com.app.rakoon;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.app.rakoon.Database.DatabaseHelper;
+import com.app.rakoon.Database.SoundEntry;
 
 import java.util.List;
 
@@ -23,16 +23,11 @@ public class YourDataActivity extends AppCompatActivity {
 		DatabaseHelper databaseHelper = new DatabaseHelper(YourDataActivity.this);
 		updateView();
 
-		data_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long l) {
-				SoundEntry soundEntry = (SoundEntry) parent.getItemAtPosition(position);
-				databaseHelper.deleteOne(soundEntry);
-				updateView();
-			}
+		data_view.setOnItemClickListener((parent, view, position, l) -> {
+			SoundEntry soundEntry = (SoundEntry) parent.getItemAtPosition(position);
+			databaseHelper.deleteOne(soundEntry);
+			updateView();
 		});
-
-
 	}
 
 	protected void updateView() {

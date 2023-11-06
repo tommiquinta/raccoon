@@ -20,4 +20,5 @@
     <string name="welcome_to_raccoon">Welcome to Raccoon!</string>
     <string name="data_size_message" />
     <string name="settings">your settings</string>
+    <string name="signal_map">Signal Map\n</string>
 </resources>

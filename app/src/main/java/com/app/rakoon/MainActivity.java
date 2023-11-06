@@ -22,7 +22,18 @@ public class MainActivity extends AppCompatActivity {
 		Button btnGoToSoundActivity = findViewById(R.id.createSoundMapButton);
 
 		btnGoToSoundActivity.setOnClickListener(v -> {
-			Intent intent = new Intent(MainActivity.this, MapActivity.class);
+			Intent intent = new Intent(MainActivity.this, SoundActivity.class);
+			startActivity(intent);
+
+		});
+
+		/**
+		 * sound map activity
+		 */
+		Button btnGoToCellularActivity = findViewById(R.id.createSignalMapButton);
+
+		btnGoToCellularActivity.setOnClickListener(v -> {
+			Intent intent = new Intent(MainActivity.this, SignalActivity.class);
 			startActivity(intent);
 
 		});
@@ -30,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
 		/**
 		 * data activity
 		 */
-
 		Button goToData = findViewById(R.id.data);
 
 		goToData.setOnClickListener(v -> {

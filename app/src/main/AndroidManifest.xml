@@ -11,6 +11,10 @@
     <!-- audio permissions -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- signal permission< -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -21,7 +25,7 @@
         android:theme="@style/Theme.Raccoon"
         tools:targetApi="31">
         <activity
-            android:name=".MapActivity"
+            android:name=".SoundActivity"
             android:exported="false"
             android:label="@string/title_activity_map" />
         <activity
@@ -40,6 +44,11 @@
 
         <activity
             android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings" />
+
+        <activity
+            android:name=".SignalActivity"
             android:exported="false"
             android:label="@string/settings" />
 
