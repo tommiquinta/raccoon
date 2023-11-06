@@ -5,6 +5,8 @@ public class SignalEntry {
 	String MGRS;
 	int signal;
 
+	double signalAvg;
+
 	String timeString;
 
 	public SignalEntry() {
@@ -28,6 +30,10 @@ public class SignalEntry {
 		this.signal = signal;
 	}
 
+	public SignalEntry(String MGRS, double signalAvg) {
+		this.MGRS = MGRS;
+		this.signalAvg = signalAvg;
+	}
 	public int getSignal_id() {
 		return this.signal_id;
 	}
@@ -53,5 +59,9 @@ public class SignalEntry {
 						", MGRS=" + MGRS +
 						", SIGNAL=" + signal +
 						", TIME= " + timeString;
+	}
+
+	public double getSignalAVG() {
+		return signalAvg;
 	}
 }

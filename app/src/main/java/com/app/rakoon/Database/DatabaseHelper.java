@@ -81,7 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	// GET ALL SOUNDS ENTRIES
 	public List<SoundEntry> getSounds() {
 		List<SoundEntry> soundData = new ArrayList<>();
-		String query = "SELECT * FROM " + SOUND_DATA;
+		String query = "SELECT * FROM " + SOUND_DATA + " ORDER BY ID DESC";
 
 		SQLiteDatabase db = this.getReadableDatabase(); // with READ, no bottleneck is created
 		Cursor cursor = db.rawQuery(query, null);
@@ -103,6 +103,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		cursor.close();
 		db.close();
 		return soundData;
+	}
+
+	public List<SignalEntry> getSignals() {
+		List<SignalEntry> signalData = new ArrayList<>();
+		String query = "SELECT * FROM " + SIGNAL_DATA + " ORDER BY ID DESC";
+
+		SQLiteDatabase db = this.getReadableDatabase(); // with READ, no bottleneck is created
+		Cursor cursor = db.rawQuery(query, null);
+
+		if (cursor.moveToFirst()) {
+			// loop through the results and create a new object, then returning it to the list
+			do {
+				int id = cursor.getInt(0);
+				String MGRS = cursor.getString(1);
+				int signal = cursor.getInt(2);
+				String time = cursor.getString(3);
+
+				SignalEntry sd = new SignalEntry(id, MGRS, signal, time);
+				signalData.add(sd);
+			} while (cursor.moveToNext());  // proceed to the db one at a time
+		} else {
+			// add nothing to list
+		}
+		cursor.close();
+		db.close();
+		return signalData;
 	}
 
 	// DELETE ONE SOUND ENTRY

@@ -6,6 +6,7 @@ import android.content.Context;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.Entry;
+import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.location.LocationRequest;
@@ -21,6 +22,7 @@ import android.telephony.CellInfo;
 import android.telephony.CellInfoLte;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -72,7 +74,6 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 	private LatLng currentLocation;
 
 	// audio
-	private boolean isRecording = false;
 	private CellSignalStrengthLte cellSignalStrengthLte;
 	private DatabaseHelper databaseHelper;
 
@@ -155,14 +156,14 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 			}
 		}
 
-		int signalStrength = 0;
+		//int signalStrength = 0;
 		int signalLevel = 0;
 		if (cellInfoLte != null) {
 			CellSignalStrengthLte signalStrengthLte = cellInfoLte.getCellSignalStrength();
-			signalStrength = signalStrengthLte.getDbm();
+			//signalStrength = signalStrengthLte.getDbm();
 			signalLevel = signalStrengthLte.getLevel();
 
-			// Puoi utilizzare i valori di signalStrength e signalLevel come preferisci
+			saveInDatabase(signalLevel);
 		}
 
 		Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
@@ -181,49 +182,55 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 	}
 
 	private void fetchData() {
-		List<SoundEntry> sounds = databaseHelper.getSounds();
-		Map<String, Double> averageDecibels;
-		averageDecibels = calculateDecibelAverages(sounds);
+		List<SignalEntry> signals = databaseHelper.getSignals();
+		Map<String, Double> averageSignals;
+		averageSignals = calculateSignalAverages(signals);
 
-		for (Map.Entry<String, Double> s : averageDecibels.entrySet()) {
-			Entry se = new SoundEntry(s.getKey(), s.getValue());
-			colorMap((SoundEntry) se);
+		for (Map.Entry<String, Double> s : averageSignals.entrySet()) {
+			SignalEntry se = new SignalEntry(s.getKey(), s.getValue());
+			Log.d("stringa: ", se.toString());
+
+			colorMap(se);
 		}
 
 	}
 
-	public static Map<String, Double> calculateDecibelAverages(List<SoundEntry> soundEntries) {
-		Map<String, List<Double>> decibelMap = new HashMap<>();
+	public Map<String, Double> calculateSignalAverages(List<SignalEntry> signals) {
+		Map<String, List<Integer>> signalMap = new HashMap<>();
 
-		for (SoundEntry entry : soundEntries) {
+		for (SignalEntry entry : signals) {
 			String MGRS = entry.getMGRS();
 			// mgrs for 10 meter squares
 			String sw = MGRS.substring(0, 9) + "" + MGRS.substring(10, 14);
 
-			double decibel = entry.getDecibel();
+			int signal = entry.getSignal();
 
-			if (!decibelMap.containsKey(sw)) {
-				decibelMap.put(sw, new ArrayList<>());
+			if (!signalMap.containsKey(sw)) {
+				signalMap.put(sw, new ArrayList<>());
 			}
-			decibelMap.get(sw).add(decibel);
+			signalMap.get(sw).add(signal);
 		}
 
-		// Calculating the average decibel for each MGRS area
-		Map<String, Double> averageDecibels = new HashMap<>();
-		for (Map.Entry<String, List<Double>> entry : decibelMap.entrySet()) {
-			List<Double> decibelList = entry.getValue();
+		// Calculating the average singal for each MGRS area
+		Map<String, Double> averageSignals = new HashMap<>();
+		for (Map.Entry<String, List<Integer>> entry : signalMap.entrySet()) {
+			List<Integer> signalList = entry.getValue();
 			double sum = 0;
-			for (Double d : decibelList) {
+			for (int d : signalList) {
 				sum += d;
 			}
-			double average = sum / decibelList.size();
-			averageDecibels.put(entry.getKey(), average);
+
+			double average = sum / signalList.size();
+
+			averageSignals.put(entry.getKey(), average);
 		}
 
-		return averageDecibels;
+		return averageSignals;
 	}
 
-	private void colorMap(@NonNull SoundEntry s) {
+	private void colorMap(@NonNull SignalEntry s) {
+		Toast.makeText(this, "data: " + s.getMGRS() + ": "+  s.getSignalAVG(), Toast.LENGTH_LONG).show();
+
 
 		String sw = s.getMGRS();
 
@@ -269,9 +276,9 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 			PolygonOptions poly = new PolygonOptions().addAll(vertices).strokeWidth(0);
 
 			// check the mean value to color the square
-			if (s.getDecibel() <= 60) {
+			if (s.getSignalAVG() >= 3.5) {
 				poly.fillColor(Color.rgb(144, 238, 144));
-			} else if (s.getDecibel() > 60 && s.getDecibel() <= 90) {
+			} else if (s.getSignalAVG() <3.5 && s.getSignalAVG() >= 1) {
 				poly.fillColor(Color.rgb(255, 215, 0));
 			} else {
 				poly.fillColor(Color.rgb(255, 0, 0));
@@ -320,12 +327,7 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 		}
 	}
 
-	private void startRecording() throws ParseException {
-
-	}
-
-	private void saveInDatabase(double db) {
-		double decibel = Math.floor(db * 100) / 100;
+	private void saveInDatabase(int signal) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
 		String time = sdf.format(new Date());
 
@@ -333,19 +335,19 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 
 		String mgrs_1 = mgrs.toString();
 
-		SoundEntry soundEntry = new SoundEntry(mgrs_1, decibel, time);
+		SignalEntry signalEntry = new SignalEntry(mgrs_1, signal, time);
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(SignalActivity.this);
 
-		boolean success = databaseHelper.addSoundEntry(soundEntry);
+		boolean success = databaseHelper.addSignalEntry(signalEntry);
 		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 		if (success) {
 			fetchData();
 		}
 	}
 
-	private void displayDecibel(double db) {
-		String decibelText = String.format("Decibel Level: %.2f dB", db);
+	private void displaySignal(int signal) {
+		String decibelText = String.format("Signal Level: %.2f dB", signal);
 		Toast.makeText(this, decibelText, Toast.LENGTH_SHORT).show();
 	}
 
