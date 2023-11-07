@@ -87,7 +87,7 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		// create map grid
 		Grids grids = Grids.create();
 		grids.setWidth(GridType.TEN_METER, 1.0);
-		grids.enableLabeler(GridType.TEN_METER);
+		//grids.enableLabeler(GridType.TEN_METER);
 
 		// create the MGRS tile provider
 		tileProvider = MGRSTileProvider.create(this, grids);
@@ -110,7 +110,6 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		mMap.clear();
 		Grids grids = Grids.create();
 		grids.setWidth(GridType.HUNDRED_METER, 1.0);
-		grids.enableLabeler(GridType.HUNDRED_METER);
 		// create the MGRS tile provider
 		tileProvider = MGRSTileProvider.create(this, grids);
 		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
@@ -132,6 +131,9 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		getLastLocation();
 	}
 
+	/**
+	 * overrided method
+	 */
 	public void fetchData() throws ParseException {
 	}
 

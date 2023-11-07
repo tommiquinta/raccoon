@@ -39,6 +39,8 @@ import mil.nga.mgrs.MGRS;
 public class SignalActivity extends MapActivity {
 
 	private DatabaseHelper databaseHelper;
+	private static int accuracy;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -106,14 +108,14 @@ public class SignalActivity extends MapActivity {
 
 	@Override
 	public void fetchData() throws ParseException {
+		accuracy = super.getAccuracy();
+
 		List<SignalEntry> signals = databaseHelper.getSignals();
 		Map<String, Double> averageSignals;
 		averageSignals = calculateSignalAverages(signals);
 
 		for (Map.Entry<String, Double> s : averageSignals.entrySet()) {
 			SignalEntry se = new SignalEntry(s.getKey(), s.getValue());
-			Log.d("stringa: ", se.toString());
-
 			colorMap(se);
 		}
 
@@ -121,7 +123,7 @@ public class SignalActivity extends MapActivity {
 
 	public Map<String, Double> calculateSignalAverages(List<SignalEntry> signals) throws ParseException {
 		Map<String, List<Integer>> signalMap = new HashMap<>();
-		VerticesHelper verticesHelper = new VerticesHelper(10);
+		VerticesHelper verticesHelper = new VerticesHelper(accuracy);
 
 		for (SignalEntry entry : signals) {
 			String MGRS = entry.getMGRS();
@@ -159,9 +161,10 @@ public class SignalActivity extends MapActivity {
 
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 		//Log.d("sw: ", sw.toString());
+		accuracy = super.getAccuracy();
 
 		// now mgrs is the location point in MGRS coord, i have to find the corresponding square
-		VerticesHelper verticesHelper = new VerticesHelper(10);
+		VerticesHelper verticesHelper = new VerticesHelper(accuracy);
 		verticesHelper.setBottom_left(sw);
 
 		sw = verticesHelper.getBottom_left();

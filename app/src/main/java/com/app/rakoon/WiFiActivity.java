@@ -42,6 +42,8 @@ import mil.nga.mgrs.MGRS;
 
 public class WiFiActivity extends MapActivity{
 	private DatabaseHelper databaseHelper;
+	private static int accuracy;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,8 @@ public class WiFiActivity extends MapActivity{
 
 	@Override
 	public void fetchData() throws ParseException {
+		accuracy = super.getAccuracy();
+
 		List<WifiEntry> wifis = databaseHelper.getWiFi();
 		Map<String, Double> averageWifis;
 		averageWifis = calculateSignalAverages(wifis);
@@ -103,7 +107,7 @@ public class WiFiActivity extends MapActivity{
 
 	public Map<String, Double> calculateSignalAverages(List<WifiEntry> wifis) throws ParseException {
 		Map<String, List<Double>> signalMap = new HashMap<>();
-		VerticesHelper verticesHelper = new VerticesHelper(10);
+		VerticesHelper verticesHelper = new VerticesHelper(accuracy);
 
 		for (WifiEntry entry : wifis) {
 			String MGRS = entry.getMGRS();
@@ -140,9 +144,10 @@ public class WiFiActivity extends MapActivity{
 
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 		//Log.d("sw: ", sw.toString());
+		accuracy = super.getAccuracy();
 
 		// now mgrs is the location point in MGRS coord, i have to find the corresponding square
-		VerticesHelper verticesHelper = new VerticesHelper(10);
+		VerticesHelper verticesHelper = new VerticesHelper(accuracy);
 		verticesHelper.setBottom_left(sw);
 
 		sw = verticesHelper.getBottom_left();
