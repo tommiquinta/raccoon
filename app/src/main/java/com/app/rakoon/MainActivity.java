@@ -28,7 +28,18 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 		/**
-		 * sound map activity
+		 * wifi map activity
+		 */
+		Button btnGoToWiFIActivity = findViewById(R.id.createWiFiMapButton);
+
+		btnGoToWiFIActivity.setOnClickListener(v -> {
+			Intent intent = new Intent(MainActivity.this, WiFiActivity.class);
+			startActivity(intent);
+
+		});
+
+		/**
+		 * signal map activity
 		 */
 		Button btnGoToCellularActivity = findViewById(R.id.createSignalMapButton);
 

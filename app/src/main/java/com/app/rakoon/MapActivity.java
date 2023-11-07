@@ -3,32 +3,23 @@ package com.app.rakoon;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-
-import com.app.rakoon.Database.DatabaseHelper;
-import com.app.rakoon.Database.SoundEntry;
-import com.app.rakoon.Helpers.VerticesHelper;
-import com.google.android.gms.location.LocationRequest;
-
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
+import com.app.rakoon.Database.DatabaseHelper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,40 +27,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import mil.nga.grid.features.Point;
-import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.grid.GridType;
-
 import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
-
-import android.graphics.Color;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 	private final int PERMISSION_ID = 42;
 	private FusedLocationProviderClient mFusedLocationClient;
 	GoogleMap mMap;
-
-	// Current Location is set to Bologna
 	LatLng currentLocation;
-
-	// audio
-	private boolean isRecording = false;
-	private AudioRecord audioRecord;
-	private int bufferSize;
-	private short[] audioData;
 
 	private DatabaseHelper databaseHelper;
 
@@ -77,6 +46,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 	 * MGRS tile provider
 	 */
 	private MGRSTileProvider tileProvider = null;
+
+	public MapActivity() {
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -119,12 +91,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		// Initializing fused location client
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-		// button to record sound decibel
-		ImageButton getDecibel = findViewById(R.id.getDecibel);
-
-		bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
-		audioData = new short[bufferSize];
 	}
 
 	// method to wait for map to be loaded

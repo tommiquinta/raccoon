@@ -53,6 +53,11 @@
             android:label="@string/settings" />
 
         <activity
+            android:name=".WiFiActivity"
+            android:exported="false"
+            android:label="@string/wi_fi_map" />
+
+        <activity
             android:name=".MapActivity"
             android:exported="false"
             android:label="@string/settings" />

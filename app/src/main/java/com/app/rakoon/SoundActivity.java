@@ -7,7 +7,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -18,7 +17,6 @@ import androidx.core.content.ContextCompat;
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Helpers.VerticesHelper;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -33,7 +31,6 @@ import java.util.Map;
 
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
-import mil.nga.mgrs.tile.MGRSTileProvider;
 
 public class SoundActivity extends MapActivity {
 
@@ -49,19 +46,7 @@ public class SoundActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		databaseHelper = new DatabaseHelper(SoundActivity.this);
-		// get the API key
-	/*	try {
-			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-			String apiKey = ai.metaData.getString("com.google.android.geo.API_KEY");
 
-			// Initializing the Places API with the help of our API_KEY
-			if (!Places.isInitialized()) {
-				Places.initialize(getApplicationContext(), apiKey);
-			}
-		} catch (PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
-		}
-	 */
 		// button to record sound decibel
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
 
@@ -147,7 +132,6 @@ public class SoundActivity extends MapActivity {
 
 		// bottom right corner
 		String se = verticesHelper.getBottom_right();
-		Log.d("SE:" , se);
 
 		// top left corner
 		String nw = verticesHelper.getTop_left();
@@ -267,6 +251,7 @@ public class SoundActivity extends MapActivity {
 		Toast.makeText(this, decibelText, Toast.LENGTH_SHORT).show();
 	}
 
+	// open permissions settings
 	private boolean isMicrophonePermissionGranted() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);

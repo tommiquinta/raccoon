@@ -34,6 +34,7 @@ public class SoundEntry implements Entry {
 		this.decibel = decibel;
 	}
 
+	@Override
 	public int getId() {
 		return sound_id;
 	}
@@ -41,6 +42,7 @@ public class SoundEntry implements Entry {
 	public double getDecibel() {
 		return decibel;
 	}
+
 
 	public String getTime() {
 		return timeString;

@@ -1,6 +1,6 @@
 package com.app.rakoon.Database;
 
-public class SignalEntry {
+public class SignalEntry implements Entry {
 	int signal_id;
 	String MGRS;
 	int signal;
@@ -43,8 +43,14 @@ public class SignalEntry {
 		return signal;
 	}
 
+	@Override
 	public String getTime() {
 		return timeString;
+	}
+
+	@Override
+	public int getId() {
+		return signal_id;
 	}
 
 	public String getMGRS() {

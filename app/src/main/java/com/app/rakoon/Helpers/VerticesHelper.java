@@ -11,6 +11,9 @@ import mil.nga.mgrs.MGRS;
  * this is an helper-class used to get the other three vertices given the bottom-left one in MGRS
  */
 public class VerticesHelper {
+	public VerticesHelper() {
+	}
+
 	public void setBottom_left(String bottom_left) {
 		this.bottom_left = bottom_left;
 	}
@@ -18,7 +21,6 @@ public class VerticesHelper {
 	private String bottom_left;
 
 	public String getBottom_left() {
-
 		return bottom_left;
 	}
 
@@ -66,12 +68,4 @@ public class VerticesHelper {
 	private String top_left;
 
 	private String top_right;
-
-	public VerticesHelper() {
-		String bottom_left = this.bottom_left;
-	}
-
-	;
-
-
 }
