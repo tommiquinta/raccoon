@@ -1,6 +1,12 @@
 package com.app.rakoon.Helpers;
 
 
+import android.util.Log;
+
+import java.text.ParseException;
+
+import mil.nga.mgrs.MGRS;
+
 /**
  * this is an helper-class used to get the other three vertices given the bottom-left one in MGRS
  */
@@ -16,56 +22,40 @@ public class VerticesHelper {
 		return bottom_left;
 	}
 
-	public String getBottom_right() {
-		char col = bottom_left.charAt(8);
-		int col_int = Integer.parseInt(String.valueOf(col));
-		int new_col = col_int + 1;
+	public String getBottom_right() throws ParseException {
+		long easting = MGRS.parse(bottom_left).getEasting();
+		easting = easting / 10;
+		easting = easting + 1;
+		long northing = MGRS.parse(bottom_left).getNorthing();
+		northing = northing / 10;
 
-		if (new_col == 10) {
-			bottom_right = bottom_left.substring(0, 7) + new_col + bottom_left.substring(9, 13);
-		} else {
-			bottom_right = bottom_left.substring(0, 8) + new_col + bottom_left.substring(9, 13);
-		}
+		bottom_right = bottom_left.substring(0, 5) + easting + northing;
 
 		return bottom_right;
 	}
 
 
-	public String getTop_left() {
-		char row = bottom_left.charAt(12);
-		int row_int = Integer.parseInt(String.valueOf(row));
-		int new_row = row_int + 1;
+	public String getTop_left() throws ParseException {
+		long easting = MGRS.parse(bottom_left).getEasting();
+		easting = easting / 10;
+		long northing = MGRS.parse(bottom_left).getNorthing();
+		northing = northing / 10;
+		northing = northing + 1;
 
-		if (new_row == 10) {
-			top_left = bottom_left.substring(0, 11) + "10";
-		} else {
-			top_left = bottom_left.substring(0, 12) + new_row;
-		}
-
+		top_left = bottom_left.substring(0, 5) + easting + northing;
 
 		return top_left;
 	}
 
-	public String getTop_right() {
-		char col = bottom_left.charAt(8);
-		int col_int = Character.getNumericValue(col);
-		int new_col = col_int + 1;
+	public String getTop_right() throws ParseException {
+		long easting = MGRS.parse(bottom_left).getEasting();
+		easting = easting / 10;
+		easting = easting + 1;
+		long northing = MGRS.parse(bottom_left).getNorthing();
+		northing = northing / 10;
+		northing = northing + 1;
 
-		char row = bottom_left.charAt(12);
-		int row_int = Character.getNumericValue(row);
-		int new_row = row_int + 1;
-
-		String top_right;
-
-		if (new_col == 10 && new_row == 10) {
-			top_right = bottom_left.substring(0, 7) + new_col + bottom_left.substring(9, 11) + "10";
-		} else if (new_col == 10) {
-			top_right = bottom_left.substring(0, 7) + new_col + bottom_left.substring(9, 12) + new_row;
-		} else if (new_row == 10) {
-			top_right = bottom_left.substring(0, 8) + new_col + bottom_left.substring(9, 11) + "10";
-		} else {
-			top_right = bottom_left.substring(0, 8) + new_col + bottom_left.substring(9, 12) + new_row;
-		}
+		top_right = bottom_left.substring(0, 5) + easting + northing;
 
 		return top_right;
 	}

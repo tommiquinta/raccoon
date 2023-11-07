@@ -7,6 +7,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -83,10 +84,14 @@ public class SoundActivity extends MapActivity {
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		super.onMapReady(googleMap);
-		fetchData();
+		try {
+			fetchData();
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	private void fetchData() {
+	private void fetchData() throws ParseException {
 		List<SoundEntry> sounds = databaseHelper.getSounds();
 
 		Map<String, Double> averageDecibels;
@@ -129,7 +134,7 @@ public class SoundActivity extends MapActivity {
 		return averageDecibels;
 	}
 
-	private void colorMap(@NonNull SoundEntry s) {
+	private void colorMap(@NonNull SoundEntry s) throws ParseException {
 
 		String sw = s.getMGRS();
 
@@ -142,6 +147,7 @@ public class SoundActivity extends MapActivity {
 
 		// bottom right corner
 		String se = verticesHelper.getBottom_right();
+		Log.d("SE:" , se);
 
 		// top left corner
 		String nw = verticesHelper.getTop_left();
@@ -215,7 +221,7 @@ public class SoundActivity extends MapActivity {
 		}
 	}
 
-	private void saveInDatabase(double db) {
+	private void saveInDatabase(double db) throws ParseException {
 		double decibel = Math.floor(db * 100) / 100;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
 		String time = sdf.format(new Date());

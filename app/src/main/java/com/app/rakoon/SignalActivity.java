@@ -128,12 +128,16 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
 
 		getDecibel.setOnClickListener(v -> {
-			getSignal();
+			try {
+				getSignal();
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
 		});
 	}
 
 
-	private void getSignal() {
+	private void getSignal() throws ParseException {
 		TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -178,10 +182,14 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 		//mMap.setOnCameraIdleListener(this);
 		//mMap.setOnMapClickListener(this);
 		getLastLocation();
-		fetchData();
+		try {
+			fetchData();
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	private void fetchData() {
+	private void fetchData() throws ParseException {
 		List<SignalEntry> signals = databaseHelper.getSignals();
 		Map<String, Double> averageSignals;
 		averageSignals = calculateSignalAverages(signals);
@@ -228,9 +236,8 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 		return averageSignals;
 	}
 
-	private void colorMap(@NonNull SignalEntry s) {
+	private void colorMap(@NonNull SignalEntry s) throws ParseException {
 		Toast.makeText(this, "data: " + s.getMGRS() + ": "+  s.getSignalAVG(), Toast.LENGTH_LONG).show();
-
 
 		String sw = s.getMGRS();
 
@@ -327,7 +334,7 @@ public class SignalActivity extends AppCompatActivity implements OnMapReadyCallb
 		}
 	}
 
-	private void saveInDatabase(int signal) {
+	private void saveInDatabase(int signal) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
 		String time = sdf.format(new Date());
 
