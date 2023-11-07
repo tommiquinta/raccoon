@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,16 +30,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
+import java.text.ParseException;
+
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.style.Grids;
 import mil.nga.mgrs.tile.MGRSTileProvider;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
-
+public abstract class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 	private final int PERMISSION_ID = 42;
 	private FusedLocationProviderClient mFusedLocationClient;
 	GoogleMap mMap;
 	LatLng currentLocation;
+
+	private int accuracy = 10;
 
 	private DatabaseHelper databaseHelper;
 
@@ -80,7 +84,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		assert mapFragment != null;
 		mapFragment.getMapAsync(this);
 
-
 		// create map grid
 		Grids grids = Grids.create();
 		grids.setWidth(GridType.TEN_METER, 1.0);
@@ -91,7 +94,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 		// Initializing fused location client
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+		ImageButton set100meters = findViewById(R.id.set100m);
+
+		set100meters.setOnClickListener(v -> {
+			try {
+				resizeGrid(100);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
+
+	public void resizeGrid(int accuracy) throws ParseException {
+		mMap.clear();
+		Grids grids = Grids.create();
+		grids.setWidth(GridType.HUNDRED_METER, 1.0);
+		grids.enableLabeler(GridType.HUNDRED_METER);
+		// create the MGRS tile provider
+		tileProvider = MGRSTileProvider.create(this, grids);
+		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
+		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.5F));
+		mMap.setMinZoomPreference(15.5F); // Set a preference for minimum zoom (Zoom out).
+		mMap.setMaxZoomPreference(17.5F); // Set a preference for maximum zoom (Zoom In).
+		setAccuracy(accuracy);
+		fetchData();
+	}
+
 
 	// method to wait for map to be loaded
 	@Override
@@ -101,6 +130,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 		//mMap.setOnCameraIdleListener(this);
 		//mMap.setOnMapClickListener(this);
 		getLastLocation();
+	}
+
+	public void fetchData() throws ParseException {
+	}
+
+	public int getAccuracy(){
+		return this.accuracy;
+	}
+
+	public void setAccuracy(int a){
+		this.accuracy = a;
 	}
 
 	// Get current location
@@ -120,13 +160,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 						// add grid layer
 						mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
 
-
 						// red fixed marker
 						// mMap.addMarker(new MarkerOptions().position(currentLocation));
 
 						// PREFERENCES FRO 10 METERS SQUARES GRID --> is there a better way to do this?
-						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18F));
-						//mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
+						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 20F));
+						mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
 						mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
 					}
 				});
@@ -187,4 +226,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 			getLastLocation();
 		}
 	}
+
 }

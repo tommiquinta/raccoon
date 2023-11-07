@@ -12,7 +12,11 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <!-- signal permission< -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- wifi permissions -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
 
 
     <application
@@ -61,7 +65,6 @@
             android:name=".MapActivity"
             android:exported="false"
             android:label="@string/settings" />
-
 
         <!-- meta data per maps -->
         <meta-data

@@ -17,24 +17,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public static final String SOUND_DATA = "SOUND_DATA";
 	public static final String SIGNAL_DATA = "SIGNAL_DATA";
+	public static final String WIFI_DATA = "WIFI_DATA";
 	public static final String DECIBEL = "DECIBEL";
 	public static final String MGRS = "MGRS";
 	public static final String TIME = "TIME";
 	public static final String ID = "ID";
 	public static final String SIGNAL = "SIGNAL";
+	public static final String WIFI = "WIFI";
 
 	public DatabaseHelper(@Nullable Context context) {
-		super(context, "user_data.db", null, 4);
+		super(context, "user_data.db", null, 6);
 	}
 
 	// called first time the db is accessed --> code to create an app
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String createSoundTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " FLOAT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
-		String createSignalTableStatement = "CREATE TABLE " + SIGNAL_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " FLOAT, " + SIGNAL + " INTEGER, " + TIME + " TEXT)";
+		String createSoundTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
 
 		db.execSQL(createSoundTableStatement);
-		db.execSQL(createSignalTableStatement);
 	}
 
 	// update the database if app gets updated, used for compatibility
@@ -46,6 +46,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	// INSERT A SOUND ENTRY
 	public boolean addSoundEntry(@NonNull SoundEntry soundEntry) {
 		SQLiteDatabase db = this.getWritableDatabase(); // with WRITE, the db is locked. no other process can update  or write, creating a bottleneck
+
 		ContentValues cv = new ContentValues(); // hashmap
 
 		cv.put(MGRS, soundEntry.getMGRS());
@@ -70,6 +71,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		cv.put(TIME, signalEntry.getTime());
 
 		long insert = db.insert(SIGNAL_DATA, null, cv);
+
+		if (insert == -1) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	public boolean addWifiEntry(@NonNull WifiEntry wifiEntry) {
+		SQLiteDatabase db = this.getWritableDatabase(); // with WRITE, the db is locked. no other process can update  or write, creating a bottleneck
+		ContentValues cv = new ContentValues(); // hashmap
+
+		cv.put(MGRS, wifiEntry.getMGRS());
+		cv.put(WIFI, wifiEntry.getWifi());
+		cv.put(TIME, wifiEntry.getTime());
+
+		long insert = db.insert(WIFI_DATA, null, cv);
 
 		if (insert == -1) {
 			return false;
@@ -129,6 +147,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		cursor.close();
 		db.close();
 		return signalData;
+	}
+
+	public List<WifiEntry> getWiFi() {
+		List<WifiEntry> wifiData = new ArrayList<>();
+		String query = "SELECT * FROM " + WIFI_DATA + " ORDER BY ID DESC";
+
+		SQLiteDatabase db = this.getReadableDatabase(); // with READ, no bottleneck is created
+		Cursor cursor = db.rawQuery(query, null);
+
+		if (cursor.moveToFirst()) {
+			// loop through the results and create a new object, then returning it to the list
+			do {
+				int id = cursor.getInt(0);
+				String MGRS = cursor.getString(1);
+				double wifi = cursor.getDouble(2);
+				String time = cursor.getString(3);
+
+				WifiEntry we = new WifiEntry(id, MGRS, wifi, time);
+				wifiData.add(we);
+			} while (cursor.moveToNext());  // proceed to the db one at a time
+		} else {
+			// add nothing to list
+		}
+		cursor.close();
+		db.close();
+		return wifiData;
 	}
 
 	// DELETE ONE SOUND ENTRY

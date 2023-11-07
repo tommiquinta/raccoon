@@ -39,7 +39,7 @@ public class SoundActivity extends MapActivity {
 	private AudioRecord audioRecord;
 	private int bufferSize;
 	private short[] audioData;
-
+	private static int accuracy;
 	private DatabaseHelper databaseHelper;
 
 	@Override
@@ -76,7 +76,11 @@ public class SoundActivity extends MapActivity {
 		}
 	}
 
-	private void fetchData() throws ParseException {
+	@Override
+	public void fetchData() throws ParseException {
+
+		accuracy = super.getAccuracy();
+
 		List<SoundEntry> sounds = databaseHelper.getSounds();
 
 		Map<String, Double> averageDecibels;
@@ -88,13 +92,15 @@ public class SoundActivity extends MapActivity {
 		}
 	}
 
-	public static Map<String, Double> calculateDecibelAverages(List<SoundEntry> soundEntries) {
+	public static Map<String, Double> calculateDecibelAverages(List<SoundEntry> soundEntries) throws ParseException {
 		Map<String, List<Double>> decibelMap = new HashMap<>();
+		VerticesHelper verticesHelper = new VerticesHelper(accuracy);
 
 		for (SoundEntry entry : soundEntries) {
 			String MGRS = entry.getMGRS();
 			// mgrs for 10 meter squares
-			String sw = MGRS.substring(0, 9) + "" + MGRS.substring(10, 14);
+			verticesHelper.setBottom_left(MGRS);
+			String sw = verticesHelper.getBottom_left();
 
 			double decibel = entry.getDecibel();
 
@@ -120,15 +126,16 @@ public class SoundActivity extends MapActivity {
 	}
 
 	private void colorMap(@NonNull SoundEntry s) throws ParseException {
-
 		String sw = s.getMGRS();
-
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 		//Log.d("sw: ", sw.toString());
-
 		// now mgrs is the location point in MGRS coord, i have to find the corresponding square
-		VerticesHelper verticesHelper = new VerticesHelper();
+		accuracy = super.getAccuracy();
+
+		VerticesHelper verticesHelper = new VerticesHelper(accuracy);
 		verticesHelper.setBottom_left(sw);
+
+		sw = verticesHelper.getBottom_left();
 
 		// bottom right corner
 		String se = verticesHelper.getBottom_right();
@@ -221,7 +228,7 @@ public class SoundActivity extends MapActivity {
 		boolean success = databaseHelper.addSoundEntry(soundEntry);
 		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 		if (success) {
-			fetchData();
+			this.fetchData();
 		}
 	}
 

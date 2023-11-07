@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
@@ -59,49 +60,52 @@ public class SignalActivity extends MapActivity {
 
 
 	private void getSignal() throws ParseException {
-		TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			int PERMISSION_ID = 42;
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSION_ID);
-			return;
-		}
-		List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
-		CellInfoLte cellInfoLte = null;
-
-		for (CellInfo cellInfo : cellInfoList) {
-			if (cellInfo instanceof CellInfoLte) {
-				cellInfoLte = (CellInfoLte) cellInfo;
-				break;
+		if (isPhonePermissionGranted()) {
+			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+				return;
 			}
+			TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+			List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
+			CellInfoLte cellInfoLte = null;
+
+			for (CellInfo cellInfo : cellInfoList) {
+				if (cellInfo instanceof CellInfoLte) {
+					cellInfoLte = (CellInfoLte) cellInfo;
+					break;
+				}
+			}
+
+			int signalStrength = 0;
+			int signalLevel = 0;
+			if (cellInfoLte != null) {
+				CellSignalStrengthLte signalStrengthLte = cellInfoLte.getCellSignalStrength();
+				signalStrength = signalStrengthLte.getDbm();
+				signalLevel = signalStrengthLte.getLevel();
+
+				saveInDatabase(signalLevel);
+			}
+
+			Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
+
 		}
+	}
 
-		//int signalStrength = 0;
-		int signalLevel = 0;
-		if (cellInfoLte != null) {
-			CellSignalStrengthLte signalStrengthLte = cellInfoLte.getCellSignalStrength();
-			//signalStrength = signalStrengthLte.getDbm();
-			signalLevel = signalStrengthLte.getLevel();
-
-			saveInDatabase(signalLevel);
-		}
-
-		Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
-
-	};
 
 	// method to wait for map to be loaded
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		super.onMapReady(googleMap);
 		try {
-			fetchData();
+			this.fetchData();
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void fetchData() throws ParseException {
+
+	@Override
+	public void fetchData() throws ParseException {
 		List<SignalEntry> signals = databaseHelper.getSignals();
 		Map<String, Double> averageSignals;
 		averageSignals = calculateSignalAverages(signals);
@@ -115,13 +119,15 @@ public class SignalActivity extends MapActivity {
 
 	}
 
-	public Map<String, Double> calculateSignalAverages(List<SignalEntry> signals) {
+	public Map<String, Double> calculateSignalAverages(List<SignalEntry> signals) throws ParseException {
 		Map<String, List<Integer>> signalMap = new HashMap<>();
+		VerticesHelper verticesHelper = new VerticesHelper(10);
 
 		for (SignalEntry entry : signals) {
 			String MGRS = entry.getMGRS();
 			// mgrs for 10 meter squares
-			String sw = MGRS.substring(0, 9) + "" + MGRS.substring(10, 14);
+			verticesHelper.setBottom_left(MGRS);
+			String sw = verticesHelper.getBottom_left();
 
 			int signal = entry.getSignal();
 
@@ -131,7 +137,7 @@ public class SignalActivity extends MapActivity {
 			signalMap.get(sw).add(signal);
 		}
 
-		// Calculating the average singal for each MGRS area
+		// Calculating the average signal for each MGRS area
 		Map<String, Double> averageSignals = new HashMap<>();
 		for (Map.Entry<String, List<Integer>> entry : signalMap.entrySet()) {
 			List<Integer> signalList = entry.getValue();
@@ -149,15 +155,16 @@ public class SignalActivity extends MapActivity {
 	}
 
 	private void colorMap(@NonNull SignalEntry s) throws ParseException {
-
 		String sw = s.getMGRS();
 
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
 		//Log.d("sw: ", sw.toString());
 
 		// now mgrs is the location point in MGRS coord, i have to find the corresponding square
-		VerticesHelper verticesHelper = new VerticesHelper();
+		VerticesHelper verticesHelper = new VerticesHelper(10);
 		verticesHelper.setBottom_left(sw);
+
+		sw = verticesHelper.getBottom_left();
 
 		// bottom right corner
 		String se = verticesHelper.getBottom_right();
@@ -196,7 +203,7 @@ public class SignalActivity extends MapActivity {
 			// check the mean value to color the square
 			if (s.getSignalAVG() >= 3.5) {
 				poly.fillColor(Color.rgb(144, 238, 144));
-			} else if (s.getSignalAVG() <3.5 && s.getSignalAVG() >= 1) {
+			} else if (s.getSignalAVG() < 3.5 && s.getSignalAVG() >= 1) {
 				poly.fillColor(Color.rgb(255, 215, 0));
 			} else {
 				poly.fillColor(Color.rgb(255, 0, 0));
@@ -227,7 +234,12 @@ public class SignalActivity extends MapActivity {
 		}
 	}
 
-
-
-
+	private boolean isPhonePermissionGranted() {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 1);
+			return false;
+		}
+		return true;
+	}
 }
+
