@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -95,11 +96,31 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		// Initializing fused location client
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-		ImageButton set100meters = findViewById(R.id.set100m);
+		// granularity buttons
+		Button set10meters = findViewById(R.id.set10m);
+		Button set100meters = findViewById(R.id.set100m);
+		Button set1km = findViewById(R.id.set1km);
+
+
+		set10meters.setOnClickListener(v -> {
+			try {
+				resizeGrid(10);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+		});
 
 		set100meters.setOnClickListener(v -> {
 			try {
 				resizeGrid(100);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
+		set1km.setOnClickListener(v -> {
+			try {
+				resizeGrid(1000);
 			} catch (ParseException e) {
 				throw new RuntimeException(e);
 			}
@@ -109,13 +130,26 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	public void resizeGrid(int accuracy) throws ParseException {
 		mMap.clear();
 		Grids grids = Grids.create();
-		grids.setWidth(GridType.HUNDRED_METER, 1.0);
-		// create the MGRS tile provider
+
 		tileProvider = MGRSTileProvider.create(this, grids);
 		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
-		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.5F));
-		mMap.setMinZoomPreference(15.5F); // Set a preference for minimum zoom (Zoom out).
-		mMap.setMaxZoomPreference(17.5F); // Set a preference for maximum zoom (Zoom In).
+		if (accuracy == 10) {
+			grids.setWidth(GridType.TEN_METER, 1.0);
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 20F));
+			mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
+			mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
+		} else if (accuracy == 100) {
+			grids.setWidth(GridType.HUNDRED_METER, 1.0);
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.5F));
+			mMap.setMinZoomPreference(15.5F); // Set a preference for minimum zoom (Zoom out).
+			mMap.setMaxZoomPreference(17.5F); // Set a preference for maximum zoom (Zoom In).
+		} else if (accuracy == 1000) {
+			grids.setWidth(GridType.KILOMETER, 1.0);
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14.5F));
+			mMap.setMinZoomPreference(12F); // Set a preference for minimum zoom (Zoom out).
+			mMap.setMaxZoomPreference(15.5F); // Set a preference for maximum zoom (Zoom In).
+		}
+
 		setAccuracy(accuracy);
 		fetchData();
 	}
@@ -137,11 +171,11 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	public void fetchData() throws ParseException {
 	}
 
-	public int getAccuracy(){
+	public int getAccuracy() {
 		return this.accuracy;
 	}
 
-	public void setAccuracy(int a){
+	public void setAccuracy(int a) {
 		this.accuracy = a;
 	}
 

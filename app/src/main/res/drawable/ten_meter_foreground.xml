@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="85dp"
+    android:height="85dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <group android:scaleX="0.56"
+        android:scaleY="0.56"
+        android:translateX="5.28"
+        android:translateY="5.28">
+
+
+        <text
+            android:text="10m"
+            android:fontFamily="sans-serif"
+            android:textSize="10dp"
+            android:textColor="#69DC9E"
+/>
+    </group>
+</vector>

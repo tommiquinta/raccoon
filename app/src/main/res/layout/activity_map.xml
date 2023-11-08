@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,7 +15,6 @@
         tools:context=".MapsActivity" />
 
     <!-- record sound button -->
-
     <ImageButton
         android:id="@+id/getDecibel"
         android:layout_width="65sp"
@@ -25,11 +25,10 @@
         android:layout_marginBottom="30sp"
         android:background="@drawable/sound_icon_background"
         android:src="@drawable/sound_icon_foreground" />
-    />
 
-
-    <ImageButton
-        android:id="@+id/set100m"
+    <!-- 10 meter square -->
+    <Button
+        android:id="@+id/set10m"
         android:layout_width="45sp"
         android:layout_height="45sp"
         android:layout_alignParentStart="true"
@@ -37,7 +36,34 @@
         android:layout_marginStart="30sp"
         android:layout_marginBottom="30sp"
         android:background="@drawable/sound_icon_background"
- />
-    />
+        android:text="10 m"
+        />
+
+    <!-- 100 meter square -->
+    <Button
+        android:id="@+id/set100m"
+        android:layout_width="45sp"
+        android:layout_height="45sp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="90sp"
+        android:layout_marginBottom="30sp"
+        android:background="@drawable/sound_icon_background"
+        android:text="100 m"
+        />
+
+    <!-- 1km meter square -->
+    <Button
+        android:id="@+id/set1km"
+        android:layout_width="45sp"
+        android:layout_height="45sp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="150sp"
+        android:layout_marginBottom="30sp"
+        android:background="@drawable/sound_icon_background"
+        android:text="1 km"
+        />
+
 
 </RelativeLayout>
