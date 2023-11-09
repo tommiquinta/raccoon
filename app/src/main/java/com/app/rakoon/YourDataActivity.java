@@ -11,6 +11,7 @@ import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Database.WifiEntry;
+import com.app.rakoon.Services.SoundService;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class YourDataActivity extends AppCompatActivity {
 		updateView();
 
 		data_view.setOnItemClickListener((parent, view, position, l) -> {
-			SignalEntry soundEntry = (SignalEntry) parent.getItemAtPosition(position);
+			SoundEntry soundEntry = (SoundEntry) parent.getItemAtPosition(position);
 			databaseHelper.deleteOne(soundEntry);
 			updateView();
 		});
@@ -36,11 +37,11 @@ public class YourDataActivity extends AppCompatActivity {
 		data_view = findViewById(R.id.data_view);
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(YourDataActivity.this);
-		List<WifiEntry> sounds = databaseHelper.getWiFi();
+		List<SoundEntry> sounds = databaseHelper.getSounds();
 
 		//Toast.makeText(this, "Size: " + sounds.size(), Toast.LENGTH_SHORT).show();
 
-		ArrayAdapter<WifiEntry> arrayAdapter = new ArrayAdapter<WifiEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
+		ArrayAdapter<SoundEntry> arrayAdapter = new ArrayAdapter<SoundEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
 		data_view.setAdapter(arrayAdapter);
 	}
 

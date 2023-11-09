@@ -1,6 +1,7 @@
 package com.app.rakoon;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
@@ -17,6 +18,8 @@ import androidx.core.content.ContextCompat;
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Helpers.VerticesHelper;
+import com.app.rakoon.Services.LocationService;
+import com.app.rakoon.Services.SoundService;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -55,11 +58,9 @@ public class SoundActivity extends MapActivity {
 
 		getDecibel.setOnClickListener(v -> {
 			if (!isRecording) {
-				try {
-					startRecording();
-				} catch (ParseException e) {
-					throw new RuntimeException(e);
-				}
+				// Passa la posizione corrente al servizio
+				startService(new Intent(this, LocationService.class));
+				startService(new Intent(this, SoundService.class));
 			} else {
 				stopRecording();
 			}
@@ -192,23 +193,8 @@ public class SoundActivity extends MapActivity {
 			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 				return;
 			}
-			audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
-			audioRecord.startRecording();
-			isRecording = true;
-			Toast.makeText(this, "Recording...", Toast.LENGTH_SHORT).show();
+			startService(new Intent(this, SoundService.class));
 
-			// wait 1 sec before measuring
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			double amplitude = getAmplitude();
-			double db = 30 * Math.log10(amplitude);
-			displayDecibel(db);
-			stopRecording();
-			saveInDatabase(db);
 		}
 	}
 

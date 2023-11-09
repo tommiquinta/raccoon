@@ -63,7 +63,6 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		// initialize database DAO
 		databaseHelper = new DatabaseHelper(MapActivity.this);
 
-
 		// get the API key
 	/*	try {
 			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);

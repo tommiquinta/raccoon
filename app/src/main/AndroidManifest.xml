@@ -72,6 +72,16 @@
             android:value="@string/my_map_api_key" />
 
 
+        <service
+            android:name=".Services.SoundService"
+            android:exported="false" />
+
+        <service
+            android:name=".Services.LocationService"
+            android:exported="false" />
+
+
+
     </application>
 
 </manifest>
