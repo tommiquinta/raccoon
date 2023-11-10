@@ -58,9 +58,11 @@ public class SoundActivity extends MapActivity {
 
 		getDecibel.setOnClickListener(v -> {
 			if (!isRecording) {
-				// Passa la posizione corrente al servizio
-				startService(new Intent(this, LocationService.class));
-				startService(new Intent(this, SoundService.class));
+				try {
+					startRecording();
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
 			} else {
 				stopRecording();
 			}
@@ -79,11 +81,9 @@ public class SoundActivity extends MapActivity {
 
 	@Override
 	public void fetchData() throws ParseException {
-
 		accuracy = super.getAccuracy();
 
 		List<SoundEntry> sounds = databaseHelper.getSounds();
-
 		Map<String, Double> averageDecibels;
 		averageDecibels = calculateDecibelAverages(sounds);
 
@@ -129,7 +129,6 @@ public class SoundActivity extends MapActivity {
 	private void colorMap(@NonNull SoundEntry s) throws ParseException {
 		String sw = s.getMGRS();
 		// this substring make the marker go on the bottom-left corner of the 10m x 10m square i'm currently in
-		//Log.d("sw: ", sw.toString());
 		// now mgrs is the location point in MGRS coord, i have to find the corresponding square
 		accuracy = super.getAccuracy();
 
@@ -193,28 +192,8 @@ public class SoundActivity extends MapActivity {
 			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 				return;
 			}
+			startService(new Intent(this, LocationService.class));
 			startService(new Intent(this, SoundService.class));
-
-		}
-	}
-
-	private void saveInDatabase(double db) throws ParseException {
-		double decibel = Math.floor(db * 100) / 100;
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
-		String time = sdf.format(new Date());
-
-		MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
-
-		String mgrs_1 = mgrs.toString();
-
-		SoundEntry soundEntry = new SoundEntry(mgrs_1, decibel, time);
-
-		DatabaseHelper databaseHelper = new DatabaseHelper(SoundActivity.this);
-
-		boolean success = databaseHelper.addSoundEntry(soundEntry);
-		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
-		if (success) {
-			this.fetchData();
 		}
 	}
 
@@ -226,24 +205,6 @@ public class SoundActivity extends MapActivity {
 		}
 	}
 
-
-	private double getAmplitude() {
-		double maxAmplitude = 0;
-
-		audioRecord.read(audioData, 0, bufferSize);
-		for (short s : audioData) {
-			if (Math.abs(s) > maxAmplitude) {
-				maxAmplitude = Math.abs(s);
-			}
-		}
-		return maxAmplitude;
-	}
-
-	private void displayDecibel(double db) {
-		String decibelText = String.format("Decibel Level: %.2f dB", db);
-		Toast.makeText(this, decibelText, Toast.LENGTH_SHORT).show();
-	}
-
 	// open permissions settings
 	private boolean isMicrophonePermissionGranted() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -252,6 +213,4 @@ public class SoundActivity extends MapActivity {
 		}
 		return true;
 	}
-
-
 }

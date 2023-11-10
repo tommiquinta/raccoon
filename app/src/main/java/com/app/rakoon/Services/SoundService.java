@@ -35,9 +35,6 @@ public class SoundService extends Service {
 	private int bufferSize;
 	private short[] audioData;
 	private BroadcastReceiver locationReceiver;
-
-
-
 	@Nullable
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -136,7 +133,6 @@ public class SoundService extends Service {
 		boolean success = databaseHelper.addSoundEntry(soundEntry);
 		showToast("Saved in database: " + success);
 		stopSelf();
-
 	}
 
 	// Helper method to display a toast
