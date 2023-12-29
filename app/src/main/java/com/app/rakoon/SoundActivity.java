@@ -186,7 +186,6 @@ public class SoundActivity extends MapActivity {
 		}
 	}
 
-
 	private void startRecording() throws ParseException {
 		if (isMicrophonePermissionGranted()) {
 			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -239,7 +238,6 @@ public class SoundActivity extends MapActivity {
 			audioRecord.release();
 		}
 	}
-
 
 	private double getAmplitude() {
 		double maxAmplitude = 0;

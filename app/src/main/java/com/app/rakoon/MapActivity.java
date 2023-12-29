@@ -262,5 +262,4 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 			getLastLocation();
 		}
 	}
-
 }

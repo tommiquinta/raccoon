@@ -199,4 +199,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			return false;
 		}
 	}
+
+	public boolean deleteOne(WifiEntry wifiEntry) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "DELETE FROM " + WIFI_DATA + " WHERE  " + ID + " = " + wifiEntry.getId();
+
+		Cursor cursor = db.rawQuery(query, null);
+		if (cursor.moveToFirst()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
