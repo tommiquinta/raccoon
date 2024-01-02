@@ -29,6 +29,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		super(context, "user_data.db", null, 6);
 	}
 
+
+
 	// called first time the db is accessed --> code to create an app
 	@Override
 	public void onCreate(SQLiteDatabase db) {

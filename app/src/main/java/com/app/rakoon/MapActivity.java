@@ -42,9 +42,7 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	private FusedLocationProviderClient mFusedLocationClient;
 	GoogleMap mMap;
 	LatLng currentLocation;
-
 	private int accuracy = 10;
-
 	private DatabaseHelper databaseHelper;
 
 	/**
@@ -62,7 +60,6 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 
 		// initialize database DAO
 		databaseHelper = new DatabaseHelper(MapActivity.this);
-
 
 		// get the API key
 	/*	try {
@@ -258,6 +255,7 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	// when permission has been obtained, do the app work
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (requestCode == PERMISSION_ID && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 			getLastLocation();
 		}

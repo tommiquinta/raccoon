@@ -2,31 +2,78 @@ package com.app.rakoon;
 // MainActivity.java
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
+import androidx.work.BackoffPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
+import com.app.rakoon.Helpers.LocationManager;
+import com.app.rakoon.Helpers.LocationWork;
+import com.app.rakoon.Helpers.PermissionManager;
 import com.app.rakoon.Services.MyService;
+
+import java.util.concurrent.TimeUnit;
 
 //import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 	private final int PERMISSION_ID = 42;
 
+	public Activity activity;
+
+	private final String[] foreground_location_permission = {Manifest.permission.ACCESS_FINE_LOCATION,
+			Manifest.permission.ACCESS_COARSE_LOCATION};
+
+	private final String[] background_location_permission = {Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+
+	private PermissionManager permissionManager;
+	private LocationManager locationManager;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		requestPermissions();
+		activity = MainActivity.this;
+
+		permissionManager = PermissionManager.getInstance(this);
+		locationManager = LocationManager.getInstance(this);
+
+
+		Button fore = findViewById(R.id.foregorund);
+		Button back = findViewById(R.id.back);
+
+		fore.setOnClickListener(v -> {
+			if (!permissionManager.checkPermissions(foreground_location_permission)) {
+				permissionManager.askPermissions(MainActivity.this, foreground_location_permission, 200);
+			}
+		});
+
+		back.setOnClickListener(v -> {
+
+			if (!permissionManager.checkPermissions(background_location_permission)) {
+				permissionManager.askPermissions(MainActivity.this, background_location_permission, 200);
+			} else {
+				if (locationManager.isLocationEnabled()) {
+					startLocationWOrk();
+				} else {
+					locationManager.createLocationRequest();
+					Toast.makeText(MainActivity.this, "Location service is not enabled", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 
 
 
@@ -89,6 +136,31 @@ public class MainActivity extends AppCompatActivity {
 			startActivity(intent);
 		});
 
+	}
+
+	private void startLocationWOrk() {
+		OneTimeWorkRequest foregroundRequest = new OneTimeWorkRequest.Builder(LocationWork.class)
+				.addTag("Location Work")
+				.setBackoffCriteria(BackoffPolicy.LINEAR,
+						OneTimeWorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.SECONDS)
+				.build();
+
+		WorkManager.getInstance(MainActivity.this).enqueue(foregroundRequest);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResult) {
+
+		super.onRequestPermissionsResult(requestCode, permissions, grantResult);
+		if (permissionManager.handlePermissionResult(MainActivity.this, 100, permissions, grantResult)) {
+			Log.d("TAG", "1");
+			if (locationManager.isLocationEnabled()) {
+				startLocationWOrk();
+			} else {
+				locationManager.createLocationRequest();
+				Toast.makeText(MainActivity.this, "Not enabled", Toast.LENGTH_SHORT).show();
+			}
+		}
 	}
 
 	// Check if notifications permissions are granted to the application

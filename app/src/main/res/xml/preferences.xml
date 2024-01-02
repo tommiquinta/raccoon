@@ -2,8 +2,16 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <SwitchPreferenceCompat
-            app:key="notifications"
-            app:title="Enable message notifications"/>
+            app:key="sound"
+            app:title="Enable Sound Measurement in background"/>
+
+        <SwitchPreferenceCompat
+            app:key="wifi"
+            app:title="Enable WiFI Measurement in background"/>
+
+        <SwitchPreferenceCompat
+            app:key="cellular"
+            app:title="Enable Cellular Signal Measurement in background"/>
 
         <Preference
             app:key="feedback"

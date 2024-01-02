@@ -59,6 +59,9 @@ dependencies {
     implementation "androidx.preference:preference-ktx:1.2.0"
 
 
+    implementation "androidx.work:work-runtime-ktx:2.8.0"
+    implementation "androidx.concurrent:concurrent-listenablefuture-callback:1.0.0-beta01"
+
     api 'mil.nga.mgrs:mgrs-android:2.2.2'
 
 }

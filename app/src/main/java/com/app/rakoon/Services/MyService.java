@@ -1,81 +1,70 @@
 package com.app.rakoon.Services;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+
 import android.app.Service;
 import android.content.Intent;
-import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 
-import com.app.rakoon.MainActivity;
+import com.app.rakoon.Helpers.LocationManager;
 
-/**
-A service is a Component, like an Activity, with the difference that it does not have a user interface, but runs in the background
-
- normal service -> user is not aware that the service is running; may be stopped due to memory necesities
- foreground service -> user is aware that the app is doing something in the background with the use of a notification; user can also interact with the notifiction
-
- Also, foreground service won't be killed even if the system is low on memory.
-
- */
 public class MyService extends Service {
 
-	@Nullable
-	@Override
-	public IBinder onBind(Intent intent) {  // creates a Bound Service -> you can ahve one active instance and multiple components connected to it.
-		return null;
-	}
-
-	private static final String CHANNEL_ID = "ForegroundServiceChannel";
+	private static final long INTERVAL = 5000; // Intervallo di aggiornamento in millisecondi (5 secondi)
+	private static final int NOTIFICATION_ID =1 ;
+	private Handler handler;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		handler = new Handler(Looper.myLooper());
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		String input = intent.getStringExtra("inputExtra");
-		createNotificationChannel();
-		Intent notificationIntent = new Intent(this, MainActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this,
-				0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+		// Avvia la richiesta della posizione ogni tot secondi utilizzando il Handler
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				requestLocation();
+				handler.postDelayed(this, INTERVAL);
+			}
+		}, INTERVAL);
 
-		Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-				.setContentTitle("Foreground Service")
-				.setContentText(input)
-				.setContentIntent(pendingIntent)
-				.build();
+		// Avvia il servizio in foreground
+		startForeground(NOTIFICATION_ID, createNotification("Starting work..."));
 
-		startForeground(1, notification);
+		return START_STICKY;
+	}
 
-		// Here is a good place to handle the location consent.
-		// You can already start the LocationEngine here.
+	private void requestLocation() {
+		LocationManager locationManager = LocationManager.getInstance(this);
 
-		return START_NOT_STICKY;
+		// Verifica se i permessi di localizzazione sono stati concessi
+			// Crea la richiesta di posizione (puoi usare il tuo metodo createLocationRequest)
+		locationManager.createLocationRequest();
+
+			// Avvia gli aggiornamenti della posizione
+		locationManager.startLocationUpdates();
+
+		Log.d("LocationUpdateService", "Richiesta posizione attuale");
+	}
+
+	@Nullable
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
 	}
 
 	@Override
 	public void onDestroy() {
-		// Here is a good place to stop the LocationEngine.
+		// Rimuovi il callback del handler quando il servizio viene distrutto
+		handler.removeCallbacksAndMessages(null);
 		super.onDestroy();
 	}
-
-	private void createNotificationChannel() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			NotificationChannel serviceChannel = new NotificationChannel(
-					CHANNEL_ID,
-					"Foreground Service Channel",
-					NotificationManager.IMPORTANCE_DEFAULT
-			);
-
-			NotificationManager manager = getSystemService(NotificationManager.class);
-			manager.createNotificationChannel(serviceChannel);
-		}
-	}
 }
+

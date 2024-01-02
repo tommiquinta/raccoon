@@ -28,9 +28,9 @@ public class SettingsActivity extends AppCompatActivity {
 
 		listener = (sharedPreferences1, key) -> {
 
-			if (key.equals("notifications")) {
+			if (key.equals("sound")) {
 				// Esegui le azioni necessarie quando la preferenza "notifications" cambia
-				boolean notificationsEnabled = sharedPreferences1.getBoolean("notifications", false);
+				boolean notificationsEnabled = sharedPreferences1.getBoolean("sound", false);
 
 				if (notificationsEnabled) {
 					startService();

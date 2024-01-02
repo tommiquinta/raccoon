@@ -196,7 +196,7 @@ public class SoundActivity extends MapActivity {
 			isRecording = true;
 			Toast.makeText(this, "Recording...", Toast.LENGTH_SHORT).show();
 
-			// wait 1 sec before measuring
+			// wait 0.5 sec before measuring
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
