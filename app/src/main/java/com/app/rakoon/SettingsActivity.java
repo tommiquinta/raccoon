@@ -15,8 +15,6 @@ import com.app.rakoon.Services.MyService;
 public class SettingsActivity extends AppCompatActivity {
 
 	private SharedPreferences.OnSharedPreferenceChangeListener listener;
-
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,9 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
 				.commit();
 	}
 
-
 	public void startService() {
-
 		Intent serviceIntent = new Intent(this, MyService.class);
 		serviceIntent.putExtra("inputExtra", "Foreground Service Example in Android");
 		ContextCompat.startForegroundService(this, serviceIntent);
@@ -60,6 +56,4 @@ public class SettingsActivity extends AppCompatActivity {
 		Intent serviceIntent = new Intent(this, MyService.class);
 		stopService(serviceIntent);
 	}
-
-
 }

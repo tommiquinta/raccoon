@@ -1,5 +1,4 @@
 package com.app.rakoon;
-// MainActivity.java
 
 import android.Manifest;
 import android.content.Intent;
@@ -27,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		requestPermissions();
-
+		checkNot();
 
 
 		/**
@@ -93,12 +92,18 @@ public class MainActivity extends AppCompatActivity {
 
 	// Check if notifications permissions are granted to the application
 	private boolean checkPermissions() {
+		return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+	}
+
+	private boolean checkNot(){
 		return ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
 	}
 
 	// Request permissions if not granted before
 	private void requestPermissions() {
 		ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ID);
+		checkPermissions();
 	}
 
 }
