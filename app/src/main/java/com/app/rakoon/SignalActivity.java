@@ -47,7 +47,6 @@ public class SignalActivity extends MapActivity {
 		super.onCreate(savedInstanceState);
 		databaseHelper = new DatabaseHelper(SignalActivity.this);
 
-
 		// button to record sound decibel
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
 
@@ -61,7 +60,7 @@ public class SignalActivity extends MapActivity {
 	}
 
 
-	private void getSignal() throws ParseException {
+	public void getSignal() throws ParseException {
 		if (isPhonePermissionGranted()) {
 			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
 				return;
