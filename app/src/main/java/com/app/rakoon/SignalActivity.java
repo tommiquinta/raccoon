@@ -40,8 +40,6 @@ public class SignalActivity extends MapActivity {
 
 	private DatabaseHelper databaseHelper;
 	private static int accuracy;
-
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

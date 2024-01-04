@@ -17,9 +17,10 @@
     <!-- wifi permissions -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <!-- Foregorund and Notifications permissions -->
+    <!-- Foreground and Notifications permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
 
 
@@ -70,7 +71,10 @@
             android:exported="false"
             android:label="@string/settings" />
 
-        <service android:name=".Services.MyService"></service>
+        <service android:name=".Services.MyService"
+            android:enabled="true"
+            android:exported="false" />
+
 
         <!-- meta data per maps -->
         <meta-data
