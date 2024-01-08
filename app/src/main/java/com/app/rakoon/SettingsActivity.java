@@ -50,8 +50,6 @@ public class SettingsActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings_layout); // Assicurati che il layout sia corretto
 
-
-
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		listener = (sharedPreferences1, key) -> {
@@ -68,7 +66,6 @@ public class SettingsActivity extends AppCompatActivity {
 			}
 		};
 		sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
-
 
 		getSupportFragmentManager()
 				.beginTransaction()

@@ -5,11 +5,13 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -95,8 +97,9 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	// Request permissions if not granted before
+	@RequiresApi(api = Build.VERSION_CODES.P)
 	private void requestPermissions() {
-		ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ID);
+		ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.FOREGROUND_SERVICE}, PERMISSION_ID);
 	}
 
 }

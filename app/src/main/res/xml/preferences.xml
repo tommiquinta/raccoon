@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Background Operations">
 
         <SwitchPreferenceCompat
             app:key="notifications"
-            app:title="Enable message notifications"/>
+            app:title="Sound Background Measurement" />
 
-        <Preference
-            app:key="feedback"
-            app:title="Send feedback"
-            app:summary="Report technical issues or suggest new features"/>
+        <SwitchPreferenceCompat
+            android:id="@+id/switchPreferenceCompat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="notifications"
+            app:title="WiFi Background Measurement" />
+
+        <SwitchPreferenceCompat
+            android:id="@+id/switchPreferenceCompat2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="notifications"
+            app:title="Enable message notifications" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Impostazioni">
+
+        <EditTextPreference
+            android:key="numeric_preference"
+            android:title="Minutes between measurements"
+            android:summary="3"
+            android:inputType="number"
+            android:defaultValue="3" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -55,7 +55,6 @@ dependencies {
     // dependecies for preferences
     implementation "androidx.preference:preference-ktx:1.2.0"
 
-
     api 'mil.nga.mgrs:mgrs-android:2.2.2'
 
 }

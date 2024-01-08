@@ -75,10 +75,8 @@ public class MyService extends Service {
 
 		dbService.save(se);
 		Log.d("SALVATO: " , "TRUE");
-
-
-
 	}
+
 	private void startLocationService() {
 		String channelId = "location_notification_channel";
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -100,10 +98,13 @@ public class MyService extends Service {
 		builder.setContentTitle("Location Service");
 		builder.setDefaults(NotificationCompat.DEFAULT_ALL);
 		builder.setContentText("Running");
+		builder.setCategory(NotificationCompat.CATEGORY_LOCATION_SHARING);
 		builder.setContentIntent(pendingIntent);
-		builder.setAutoCancel(false);
 		builder.setOngoing(true);
+		builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 		builder.setPriority(NotificationCompat.PRIORITY_MAX);
+
+		builder.setDeleteIntent(null);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			if (notificationManager != null && notificationManager.getNotificationChannel(channelId) == null) {
@@ -113,6 +114,8 @@ public class MyService extends Service {
 						NotificationManager.IMPORTANCE_HIGH
 				);
 				notificationChannel.setDescription("Channel for location service.");
+				notificationChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
+				notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 				notificationManager.createNotificationChannel(notificationChannel);
 			}
 		}
@@ -165,9 +168,6 @@ public class MyService extends Service {
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
-
-
-
 	private void repeat() {
 		// Avvia il servizio di localizzazione ogni 5 secondi
 		handler.postDelayed(runnable = new Runnable() {
