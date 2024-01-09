@@ -20,14 +20,22 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
+import com.app.rakoon.Database.SoundEntry;
+import com.app.rakoon.Database.WifiEntry;
+import com.app.rakoon.Helpers.SignalHelper;
+import com.app.rakoon.Helpers.SoundHelper;
+import com.app.rakoon.Helpers.WiFiHelper;
 import com.app.rakoon.R;
+import com.app.rakoon.SoundActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -43,6 +51,10 @@ import mil.nga.mgrs.MGRS;
  */
 public class MyService extends Service {
 
+	SignalHelper signalHelper;
+	WiFiHelper wiFiHelper;
+	SoundHelper soundHelper;
+
 	private final LocationCallback locationCallback = new LocationCallback() {
 		@Override
 		public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -51,8 +63,22 @@ public class MyService extends Service {
 				double latitude = locationResult.getLastLocation().getLatitude();
 				double longitude = locationResult.getLastLocation().getLongitude();
 				Location location = locationResult.getLastLocation();
-				saveindb(location);
-				Log.d("LOCATION_UPDATE", latitude + ", " + longitude);
+
+				int signal;
+				double wifi;
+				double sound;
+
+				signal = signalHelper.getSignal();
+				try {
+					wifi = wiFiHelper.getWiFi();
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
+				sound = soundHelper.getSound();
+
+				save(location, signal, wifi, sound);
+
+				Log.d("LOCATION_UPDATE", latitude + ", " + longitude + "\nSIGNAL: " + signal);
 			}
 		}
 	};
@@ -63,21 +89,25 @@ public class MyService extends Service {
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
-	public void saveindb(Location location){
-		DB_service dbService = new DB_service(this);
+	public void save(Location location, int signal, double wifi, double sound){
+		DatabaseHelper dbService = new DatabaseHelper(this);
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
 		String time = sdf.format(new Date());
 
 		MGRS mgrs = MGRS.from(location.getLongitude(), location.getLatitude());
 
-		SignalEntry se = new SignalEntry(mgrs.toString(), 50, time);
+		SignalEntry signalEntry = new SignalEntry(mgrs.toString(), signal, time);
+		WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
+		SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
 
-		dbService.save(se);
+		dbService.addSignalEntry(signalEntry);
+		dbService.addWifiEntry(wifiEntry);
+		dbService.addSoundEntry(soundEntry);
 		Log.d("SALVATO: " , "TRUE");
 	}
 
-	private void startLocationService() {
+	private void startLocationService(String type) {
 		String channelId = "location_notification_channel";
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -144,7 +174,7 @@ public class MyService extends Service {
 				.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 	}
 
-	private void stopLocationService(){
+	private void stopLocationService(String type){
 		LocationServices.getFusedLocationProviderClient(this)
 				.removeLocationUpdates(locationCallback);
 		stopForeground(true);
@@ -156,20 +186,25 @@ public class MyService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if (intent != null) {
-			String action = intent.getAction();
-			if (action != null) {
-				if (action.equals(Constants.ACTION_START_LOCATION_SERVICE)) {
-					startLocationService();
-				} else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
-					stopLocationService();
-				}
+		String type = intent.getStringExtra("type");
+		assert type != null;
+		Log.d("TYPEEE", type);
+		String action = intent.getAction();
+
+		signalHelper = new SignalHelper(getApplicationContext());
+		wiFiHelper = new WiFiHelper(getApplicationContext());
+		soundHelper = new SoundHelper(getApplicationContext());
+
+		if (action != null) {
+			if (action.equals(Constants.ACTION_START_LOCATION_SERVICE)) {
+				startLocationService(type);
+			} else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
+				stopLocationService(type);
 			}
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
 	private void repeat() {
-		// Avvia il servizio di localizzazione ogni 5 secondi
 		handler.postDelayed(runnable = new Runnable() {
 			public void run() {
 				Log.d("START","partito");

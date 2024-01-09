@@ -5,21 +5,21 @@
     <PreferenceCategory app:title="Background Operations">
 
         <SwitchPreferenceCompat
-            app:key="notifications"
+            app:key="SoundBG"
             app:title="Sound Background Measurement" />
 
         <SwitchPreferenceCompat
             android:id="@+id/switchPreferenceCompat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="notifications"
+            app:key="WiFiBG"
             app:title="WiFi Background Measurement" />
 
         <SwitchPreferenceCompat
             android:id="@+id/switchPreferenceCompat2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="notifications"
+            app:key="SignalBG"
             app:title="Enable message notifications" />
     </PreferenceCategory>
 

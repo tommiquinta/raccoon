@@ -1,14 +1,9 @@
 package com.app.rakoon.Fragments;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
-
 import androidx.preference.EditTextPreference;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
-
 import com.app.rakoon.R;
 
 
@@ -16,13 +11,10 @@ public class Settings extends PreferenceFragmentCompat {
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 		setPreferencesFromResource(R.xml.preferences, rootKey);
-		// Ottieni la preferenza numerica
 		EditTextPreference numericPreference = findPreference("numeric_preference");
 
-		// Imposta il listener per il cambiamento di preferenza
 		assert numericPreference != null;
 		numericPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-			// Verifica se il nuovo valore è un numero intero
 			try {
 				int numericValue = Integer.parseInt((String) newValue);
 
