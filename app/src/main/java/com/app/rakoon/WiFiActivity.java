@@ -72,7 +72,7 @@ public class WiFiActivity extends MapActivity{
 			double signalStrength = 0;
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
 				signalStrength = capabilities.getSignalStrength();
-				saveInDatabase(signalStrength);
+				saveInDatabaseAsync(signalStrength);
 			}
 			Toast.makeText(this, "signalLevel: " + signalStrength, Toast.LENGTH_SHORT).show();
 		}
@@ -202,24 +202,34 @@ public class WiFiActivity extends MapActivity{
 		}
 	}
 
-	private void saveInDatabase(double signal) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
-		String time = sdf.format(new Date());
+	private void saveInDatabaseAsync(final double signal) {
+		new Thread(() -> {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
+			String time = sdf.format(new Date());
 
-		MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
+			MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
+			String mgrs_1 = mgrs.toString();
 
-		String mgrs_1 = mgrs.toString();
+			WifiEntry wifiEntry = new WifiEntry(mgrs_1, signal, time);
 
-		WifiEntry wifiEntry = new WifiEntry(mgrs_1, signal, time);
+			DatabaseHelper databaseHelper = new DatabaseHelper(WiFiActivity.this);
 
-		DatabaseHelper databaseHelper = new DatabaseHelper(WiFiActivity.this);
+			final boolean success = databaseHelper.addWifiEntry(wifiEntry);
 
-		boolean success = databaseHelper.addWifiEntry(wifiEntry);
-		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
-		if (success) {
-			fetchData();
-		}
+			runOnUiThread(() -> {
+				Toast.makeText(WiFiActivity.this, "Saved: " + success, Toast.LENGTH_SHORT).show();
+				if (success) {
+					try {
+						fetchData();
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
+
+		}).start();
 	}
+
 
 
 

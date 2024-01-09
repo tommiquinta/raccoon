@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat;
 public class SoundHelper {
 	private Context context;
 	private boolean isRecording = false;
-
 	private AudioRecord audioRecord;
 	private int bufferSize;
 	private short[] audioData;

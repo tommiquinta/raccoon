@@ -190,7 +190,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public boolean deleteOne(SignalEntry signalEntry) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String query = "DELETE FROM " + SIGNAL_DATA + " WHERE  " + ID + " = " + signalEntry.signal_id;
+		String query = "DELETE FROM " + SIGNAL_DATA + " WHERE  " + ID + " = " + signalEntry.getId();
 
 		Cursor cursor = db.rawQuery(query, null);
 		if (cursor.moveToFirst()) {
