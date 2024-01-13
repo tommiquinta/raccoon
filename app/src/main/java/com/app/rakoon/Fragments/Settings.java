@@ -72,4 +72,5 @@ public class Settings extends PreferenceFragmentCompat {
 			numericPreference.setSummary(String.valueOf(savedNumericValue));
 		}
 	}
+
 }
