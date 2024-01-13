@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
+import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -40,11 +41,11 @@ public class SignalActivity extends MapActivity {
 
 	private DatabaseHelper databaseHelper;
 	private static int accuracy;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		databaseHelper = new DatabaseHelper(SignalActivity.this);
-
 
 		// button to record sound decibel
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
@@ -60,38 +61,12 @@ public class SignalActivity extends MapActivity {
 
 
 	private void getSignal() throws ParseException {
-		if (isPhonePermissionGranted()) {
-			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
-				return;
-			}
-			TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-			List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
-			CellInfoLte cellInfoLte = null;
-
-			for (CellInfo cellInfo : cellInfoList) {
-				if (cellInfo instanceof CellInfoLte) {
-					cellInfoLte = (CellInfoLte) cellInfo;
-					break;
-				}
-			}
-
-			int signalStrength = 0;
-			int signalLevel = 0;
-			if (cellInfoLte != null) {
-				CellSignalStrengthLte signalStrengthLte = cellInfoLte.getCellSignalStrength();
-				signalStrength = signalStrengthLte.getDbm();
-				signalLevel = signalStrengthLte.getLevel();
-
-				saveInDatabase(signalLevel);
-			}
-
-			Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
-
-		}
+		SignalHelper signalHelper = SignalHelper.getInstance(this);
+		int signalLevel = signalHelper.getSignal();
+		saveInDatabase(signalLevel);
+		Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
+		saveInDatabase(signalLevel);
 	}
-
-
 	// method to wait for map to be loaded
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {

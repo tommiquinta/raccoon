@@ -10,6 +10,8 @@ import android.net.NetworkCapabilities;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoLte;
 import android.telephony.CellSignalStrengthLte;
@@ -25,6 +27,7 @@ import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.WifiEntry;
 import com.app.rakoon.Helpers.VerticesHelper;
+import com.app.rakoon.Helpers.WiFiHelper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -62,19 +65,14 @@ public class WiFiActivity extends MapActivity{
 		});
 	}
 
-
 	private void getWiFi() throws ParseException {
-		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		Network network = connectivityManager.getActiveNetwork();
-		NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
-
-		if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-			double signalStrength = 0;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-				signalStrength = capabilities.getSignalStrength();
-				saveInDatabaseAsync(signalStrength);
-			}
-			Toast.makeText(this, "signalLevel: " + signalStrength, Toast.LENGTH_SHORT).show();
+		WiFiHelper wiFiHelper = new WiFiHelper(this);
+		double signalStrength = wiFiHelper.getWiFi();
+		if(signalStrength == 101){  // wifi error
+			Toast.makeText(this, "No WiFi network Available.", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(this, "Wifi Strength: " + signalStrength, Toast.LENGTH_SHORT).show();
+			saveInDatabaseAsync(signalStrength);
 		}
 	};
 
@@ -82,28 +80,34 @@ public class WiFiActivity extends MapActivity{
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		super.onMapReady(googleMap);
-		try {
-			this.fetchData();
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
+		this.fetchData();
 	}
 
 	@Override
-	public void fetchData() throws ParseException {
-		accuracy = super.getAccuracy();
+	public void fetchData() {
+		new Thread(() -> {
+			try {
+				accuracy = super.getAccuracy();
+				List<WifiEntry> wifis = databaseHelper.getWiFi();
+				Map<String, Double> averageWifis;
+				averageWifis = calculateSignalAverages(wifis);
 
-		List<WifiEntry> wifis = databaseHelper.getWiFi();
-		Map<String, Double> averageWifis;
-		averageWifis = calculateSignalAverages(wifis);
-
-		for (Map.Entry<String, Double> s : averageWifis.entrySet()) {
-			WifiEntry we = new WifiEntry(s.getKey(), s.getValue());
-
-			colorMap(we);
-		}
-
+				for (Map.Entry<String, Double> s : averageWifis.entrySet()) {
+					WifiEntry we = new WifiEntry(s.getKey(), s.getValue());
+					new Handler(Looper.getMainLooper()).post(() -> {
+						try {
+							colorMap(we);
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
+					});
+				}
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
+
 
 	public Map<String, Double> calculateSignalAverages(List<WifiEntry> wifis) throws ParseException {
 		Map<String, List<Double>> signalMap = new HashMap<>();
@@ -185,7 +189,6 @@ public class WiFiActivity extends MapActivity{
 			 */
 
 			PolygonOptions poly = new PolygonOptions().addAll(vertices).strokeWidth(0);
-			Toast.makeText(this, "avg: " + s.getWifi(), Toast.LENGTH_SHORT).show();
 
 			// check the mean value to color the square
 			if (s.getWifi() >= -60) {
@@ -219,18 +222,9 @@ public class WiFiActivity extends MapActivity{
 			runOnUiThread(() -> {
 				Toast.makeText(WiFiActivity.this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 				if (success) {
-					try {
-						fetchData();
-					} catch (ParseException e) {
-						throw new RuntimeException(e);
-					}
+					fetchData();
 				}
 			});
-
 		}).start();
 	}
-
-
-
-
 }

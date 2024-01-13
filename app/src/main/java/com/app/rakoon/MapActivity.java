@@ -24,6 +24,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -219,10 +220,10 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	// from previous location
 	@SuppressLint("MissingPermission")
 	private void requestNewLocationData() {
-		LocationRequest locationRequest = LocationRequest.create().setWaitForAccurateLocation(true);
-		locationRequest.setInterval(0);
-		locationRequest.setFastestInterval(0);
-		locationRequest.setNumUpdates(1);
+		LocationRequest locationRequest;
+		locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
+				.setWaitForAccurateLocation(true)
+				.build();
 
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 		mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
@@ -258,6 +259,7 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	// when permission has been obtained, do the app work
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (requestCode == PERMISSION_ID && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 			getLastLocation();
 		}

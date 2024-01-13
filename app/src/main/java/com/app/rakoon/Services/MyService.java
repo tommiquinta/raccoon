@@ -1,5 +1,7 @@
 package com.app.rakoon.Services;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -7,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -24,6 +27,7 @@ import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Database.WifiEntry;
+import com.app.rakoon.Fragments.Settings;
 import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.WiFiHelper;
@@ -50,7 +54,6 @@ import mil.nga.mgrs.MGRS;
  * Also, foreground service won't be killed even if the system is low on memory.
  */
 public class MyService extends Service {
-
 	SignalHelper signalHelper;
 	WiFiHelper wiFiHelper;
 	SoundHelper soundHelper;
@@ -82,11 +85,10 @@ public class MyService extends Service {
 			}
 		}
 	};
-
 	@Nullable
 	@Override
 	public IBinder onBind(Intent intent) {
-		throw new UnsupportedOperationException("Not yet implemented");
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	public void save(Location location, int signal, double wifi, double sound){
@@ -107,12 +109,12 @@ public class MyService extends Service {
 		Log.d("SALVATO: " , "TRUE");
 	}
 
-	private void startLocationService(String type) {
+	private void startLocationService() {
 		String channelId = "location_notification_channel";
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		Intent resultIntent = new Intent();
-		PendingIntent pendingIntent = PendingIntent.getActivity(
+		PendingIntent pendingIntent = getActivity(
 				getApplicationContext(),
 				0,
 				resultIntent,
@@ -125,7 +127,7 @@ public class MyService extends Service {
 		);
 
 		builder.setSmallIcon(R.mipmap.ic_launcher);
-		builder.setContentTitle("Location Service");
+		builder.setContentTitle("Raccoon Service");
 		builder.setDefaults(NotificationCompat.DEFAULT_ALL);
 		builder.setContentText("Running");
 		builder.setCategory(NotificationCompat.CATEGORY_LOCATION_SHARING);
@@ -156,8 +158,9 @@ public class MyService extends Service {
 	}
 
 	public void getLocation(){
+
 		LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
-				.setMaxUpdates(1)
+				.setMaxUpdates(1)   // very important
 				.build();
 
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -174,7 +177,7 @@ public class MyService extends Service {
 				.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 	}
 
-	private void stopLocationService(String type){
+	private void stopLocationService(){
 		LocationServices.getFusedLocationProviderClient(this)
 				.removeLocationUpdates(locationCallback);
 		stopForeground(true);
@@ -186,20 +189,17 @@ public class MyService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		String type = intent.getStringExtra("type");
-		assert type != null;
-		Log.d("TYPEEE", type);
 		String action = intent.getAction();
 
-		signalHelper = new SignalHelper(getApplicationContext());
+		signalHelper = SignalHelper.getInstance(getApplicationContext());
 		wiFiHelper = new WiFiHelper(getApplicationContext());
 		soundHelper = new SoundHelper(getApplicationContext());
 
 		if (action != null) {
 			if (action.equals(Constants.ACTION_START_LOCATION_SERVICE)) {
-				startLocationService(type);
+				startLocationService();
 			} else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
-				stopLocationService(type);
+				stopLocationService();
 			}
 		}
 		return super.onStartCommand(intent, flags, startId);
@@ -207,17 +207,19 @@ public class MyService extends Service {
 	private void repeat() {
 		handler.postDelayed(runnable = new Runnable() {
 			public void run() {
-				Log.d("START","partito");
+				Log.d("START", "partito");
 				getLocation();
 
-				handler.postDelayed(this, 5000);
+				int delayMillis = Settings.getNumericValue(getApplicationContext()) * 60000;
+				Log.d("MINUTI", String.valueOf(delayMillis));
+
+				handler.postDelayed(this, delayMillis);
 			}
-		}, 5000); // Avvia dopo 5 secondi dalla chiamata iniziale
+		}, 0); // start immediately after first call
 	}
 
 	@Override
 	public void onDestroy() {
-		// Rimuove il callback per evitare memory leaks
 		handler.removeCallbacks(runnable);
 		super.onDestroy();
 	}

@@ -1,13 +1,18 @@
 package com.app.rakoon;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.app.rakoon.Fragments.Settings;
@@ -18,6 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 	private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
 	private SharedPreferences.OnSharedPreferenceChangeListener listener;
+
 	private boolean isLocationServiceRunning() {
 		ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		if (activityManager != null) {
@@ -46,11 +52,22 @@ public class SettingsActivity extends AppCompatActivity {
 
 			switch (key) {
 				case "SoundBG": {
-					boolean notificationsEnabled = sharedPreferences1.getBoolean("SoundBG", false);
-					if (notificationsEnabled) {
-						startService(Constants.SOUND);
+					askNotificationsPermission();
+					boolean permissionGiven = checkPermission();
+					if (permissionGiven) {
+						boolean notificationsEnabled = sharedPreferences1.getBoolean("SoundBG", false);
+
+						if (notificationsEnabled) {
+							startService(Constants.SOUND);
+						} else {
+							stopService(Constants.SOUND);
+						}
+						break;
 					} else {
-						stopService(Constants.SOUND);
+						SharedPreferences.Editor editor = sharedPreferences.edit();
+						editor.putBoolean("mute", false);
+						editor.apply();
+						Toast.makeText(this, "Please allow Push Notifications permission in you device's Settings.", Toast.LENGTH_SHORT).show();
 					}
 					break;
 				}
@@ -72,6 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
 					}
 					break;
 				}
+
 			}
 		};
 		sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
@@ -80,6 +98,18 @@ public class SettingsActivity extends AppCompatActivity {
 				.beginTransaction()
 				.replace(R.id.settings_container, new Settings())
 				.commit();
+	}
+
+	private boolean checkPermission() {
+		return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+	}
+
+	private boolean askNotificationsPermission() {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+			return false;
+		}
+		return true;
 	}
 
 
@@ -101,4 +131,22 @@ public class SettingsActivity extends AppCompatActivity {
 			Toast.makeText(this, "Location Service Disabled", Toast.LENGTH_SHORT).show();
 		}
 	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			Toast.makeText(this, "Notifications Permission given.", Toast.LENGTH_SHORT).show();
+
+			boolean notificationsEnabled = sharedPreferences.getBoolean("SoundBG", false);
+			if (notificationsEnabled) {
+				startService(Constants.SOUND);
+			} else {
+				stopService(Constants.SOUND);
+			}
+		}
+	}
+
 }

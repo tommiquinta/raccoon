@@ -34,7 +34,6 @@ public class SoundHelper {
 			audioRecord.startRecording();
 			isRecording = true;
 
-
 			// wait 1 sec before measuring
 			try {
 				Thread.sleep(500);
@@ -74,6 +73,5 @@ public class SoundHelper {
 	private boolean isMicrophonePermissionGranted() {
 		return ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
 	}
-
 
 }

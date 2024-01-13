@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SoundEntry;
+import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -191,25 +192,16 @@ public class SoundActivity extends MapActivity {
 			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 				return;
 			}
-			audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
-			audioRecord.startRecording();
-			isRecording = true;
-			Toast.makeText(this, "Recording...", Toast.LENGTH_SHORT).show();
-
-			// wait 1 sec before measuring
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			SoundHelper soundHelper = new SoundHelper(this);
+			double sound = soundHelper.getSound();
+			displayDecibel(sound);
+			if(sound != Double.POSITIVE_INFINITY) {
+				saveInDatabase(sound);
 			}
-
-			double amplitude = getAmplitude();
-			double db = 30 * Math.log10(amplitude);
-			displayDecibel(db);
-			stopRecording();
-			saveInDatabase(db);
 		}
 	}
+
+
 
 	private void saveInDatabase(double db) throws ParseException {
 		double decibel = Math.floor(db * 100) / 100;
@@ -239,18 +231,6 @@ public class SoundActivity extends MapActivity {
 		}
 	}
 
-	private double getAmplitude() {
-		double maxAmplitude = 0;
-
-		audioRecord.read(audioData, 0, bufferSize);
-		for (short s : audioData) {
-			if (Math.abs(s) > maxAmplitude) {
-				maxAmplitude = Math.abs(s);
-			}
-		}
-		return maxAmplitude;
-	}
-
 	private void displayDecibel(double db) {
 		String decibelText = String.format("Decibel Level: %.2f dB", db);
 		Toast.makeText(this, decibelText, Toast.LENGTH_SHORT).show();
@@ -258,7 +238,7 @@ public class SoundActivity extends MapActivity {
 
 	// open permissions settings
 	private boolean isMicrophonePermissionGranted() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
 			return false;
 		}

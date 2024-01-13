@@ -33,7 +33,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String createSoundTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
-
 		db.execSQL(createSoundTableStatement);
 	}
 

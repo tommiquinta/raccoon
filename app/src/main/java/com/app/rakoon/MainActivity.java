@@ -28,7 +28,9 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		requestPermissions();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			requestPermissions();
+		}
 
 		/**
 		 *

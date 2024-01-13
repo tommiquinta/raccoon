@@ -5,6 +5,7 @@
     <PreferenceCategory app:title="Background Operations">
 
         <SwitchPreferenceCompat
+            android:id="@+id/switchSound"
             app:key="SoundBG"
             app:title="Sound Background Measurement" />
 
@@ -29,7 +30,7 @@
             android:key="numeric_preference"
             android:title="Minutes between measurements"
             android:summary="3"
-            android:inputType="number"
+            android:inputType="phone"
             android:defaultValue="3" />
     </PreferenceCategory>
 
