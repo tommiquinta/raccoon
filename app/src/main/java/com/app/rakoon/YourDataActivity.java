@@ -25,7 +25,7 @@ public class YourDataActivity extends AppCompatActivity {
 		updateView();
 
 		data_view.setOnItemClickListener((parent, view, position, l) -> {
-			SoundEntry soundEntry = (SoundEntry) parent.getItemAtPosition(position);
+			WifiEntry soundEntry = (WifiEntry) parent.getItemAtPosition(position);
 			databaseHelper.deleteOne(soundEntry);
 			updateView();
 		});
@@ -35,11 +35,11 @@ public class YourDataActivity extends AppCompatActivity {
 		data_view = findViewById(R.id.data_view);
 
 		DatabaseHelper databaseHelper = new DatabaseHelper(YourDataActivity.this);
-		List<SoundEntry> sounds = databaseHelper.getSounds();
+		List<WifiEntry> sounds = databaseHelper.getWiFi();
 
 		//Toast.makeText(this, "Size: " + sounds.size(), Toast.LENGTH_SHORT).show();
 
-		ArrayAdapter<SoundEntry> arrayAdapter = new ArrayAdapter<SoundEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
+		ArrayAdapter<WifiEntry> arrayAdapter = new ArrayAdapter<WifiEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
 		data_view.setAdapter(arrayAdapter);
 	}
 }

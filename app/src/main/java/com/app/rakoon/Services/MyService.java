@@ -85,13 +85,14 @@ public class MyService extends Service {
 			}
 		}
 	};
+
 	@Nullable
 	@Override
 	public IBinder onBind(Intent intent) {
 		throw new UnsupportedOperationException("Not implemented");
 	}
 
-	public void save(Location location, int signal, double wifi, double sound){
+	public void save(Location location, int signal, double wifi, double sound) {
 		DatabaseHelper dbService = new DatabaseHelper(this);
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
@@ -100,13 +101,20 @@ public class MyService extends Service {
 		MGRS mgrs = MGRS.from(location.getLongitude(), location.getLatitude());
 
 		SignalEntry signalEntry = new SignalEntry(mgrs.toString(), signal, time);
+
 		WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
 		SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
 
+
 		dbService.addSignalEntry(signalEntry);
-		dbService.addWifiEntry(wifiEntry);
-		dbService.addSoundEntry(soundEntry);
-		Log.d("SALVATO: " , "TRUE");
+		if (wifiEntry.getWifi() != 101) {
+			dbService.addWifiEntry(wifiEntry);
+		}
+
+		if (soundEntry.getDecibel() != Double.POSITIVE_INFINITY) {
+			dbService.addSoundEntry(soundEntry);
+		}
+		Log.d("SALVATO: ", "TRUE");
 	}
 
 	private void startLocationService() {
@@ -157,7 +165,7 @@ public class MyService extends Service {
 		startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 	}
 
-	public void getLocation(){
+	public void getLocation() {
 
 		LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
 				.setMaxUpdates(1)   // very important
@@ -177,7 +185,7 @@ public class MyService extends Service {
 				.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 	}
 
-	private void stopLocationService(){
+	private void stopLocationService() {
 		LocationServices.getFusedLocationProviderClient(this)
 				.removeLocationUpdates(locationCallback);
 		stopForeground(true);
@@ -204,6 +212,7 @@ public class MyService extends Service {
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
+
 	private void repeat() {
 		handler.postDelayed(runnable = new Runnable() {
 			public void run() {
