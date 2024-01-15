@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat;
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.WifiEntry;
+import com.app.rakoon.Fragments.Settings;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.app.rakoon.Helpers.WiFiHelper;
 import com.google.android.gms.maps.GoogleMap;
@@ -126,12 +127,22 @@ public class WiFiActivity extends MapActivity{
 			signalMap.get(sw).add(signal);
 		}
 
+		int userLimit = Settings.getNumber(getApplicationContext());
+		int limit = 0;
+
 		// Calculating the average singal for each MGRS area
 		Map<String, Double> averageSignals = new HashMap<>();
 		for (Map.Entry<String, List<Double>> entry : signalMap.entrySet()) {
 			List<Double> signalList = entry.getValue();
+
+			if (signalList.size() > userLimit) {
+				signalList = signalList.subList(0, userLimit);
+			}
+
 			double sum = 0;
-			for (double d : signalList) {
+
+			for(double d: signalList){
+				Log.d("signal: ", String.valueOf(d));
 				sum += d;
 			}
 

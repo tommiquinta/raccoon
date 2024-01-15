@@ -7,6 +7,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SoundEntry;
+import com.app.rakoon.Fragments.Settings;
 import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.maps.GoogleMap;
@@ -93,7 +95,7 @@ public class SoundActivity extends MapActivity {
 		}
 	}
 
-	public static Map<String, Double> calculateDecibelAverages(List<SoundEntry> soundEntries) throws ParseException {
+	public Map<String, Double> calculateDecibelAverages(List<SoundEntry> soundEntries) throws ParseException {
 		Map<String, List<Double>> decibelMap = new HashMap<>();
 		VerticesHelper verticesHelper = new VerticesHelper(accuracy);
 
@@ -111,18 +113,27 @@ public class SoundActivity extends MapActivity {
 			decibelMap.get(sw).add(decibel);
 		}
 
+		int userLimit = Settings.getNumber(getApplicationContext());
+		int limit = 0;
+
 		// Calculating the average decibel for each MGRS area
 		Map<String, Double> averageDecibels = new HashMap<>();
 		for (Map.Entry<String, List<Double>> entry : decibelMap.entrySet()) {
 			List<Double> decibelList = entry.getValue();
+
+			if (decibelList.size() > userLimit) {
+				decibelList = decibelList.subList(0, userLimit);
+			}
+
 			double sum = 0;
-			for (Double d : decibelList) {
+
+			for(double d: decibelList){
+				Log.d("sound: ", String.valueOf(d));
 				sum += d;
 			}
 			double average = sum / decibelList.size();
 			averageDecibels.put(entry.getKey(), average);
 		}
-
 		return averageDecibels;
 	}
 

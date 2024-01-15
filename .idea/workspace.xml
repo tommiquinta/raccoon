@@ -18,9 +18,10 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Fragments/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Fragments/Settings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Services/MyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Services/MyService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SignalActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SignalActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SoundActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SoundActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/WiFiActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/WiFiActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/YourDataActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/YourDataActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/xml/preferences.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/xml/preferences.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

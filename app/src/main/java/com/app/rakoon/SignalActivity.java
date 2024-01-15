@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
+import com.app.rakoon.Fragments.Settings;
 import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.maps.GoogleMap;
@@ -67,6 +68,7 @@ public class SignalActivity extends MapActivity {
 		Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
 		saveInDatabase(signalLevel);
 	}
+
 	// method to wait for map to be loaded
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -91,7 +93,6 @@ public class SignalActivity extends MapActivity {
 			SignalEntry se = new SignalEntry(s.getKey(), s.getValue());
 			colorMap(se);
 		}
-
 	}
 
 	public Map<String, Double> calculateSignalAverages(List<SignalEntry> signals) throws ParseException {
@@ -100,7 +101,7 @@ public class SignalActivity extends MapActivity {
 
 		for (SignalEntry entry : signals) {
 			String MGRS = entry.getMGRS();
-			// mgrs for 10 meter squares
+
 			verticesHelper.setBottom_left(MGRS);
 			String sw = verticesHelper.getBottom_left();
 
@@ -112,12 +113,20 @@ public class SignalActivity extends MapActivity {
 			signalMap.get(sw).add(signal);
 		}
 
+		int userLimit = Settings.getNumber(getApplicationContext());
+
 		// Calculating the average signal for each MGRS area
 		Map<String, Double> averageSignals = new HashMap<>();
 		for (Map.Entry<String, List<Integer>> entry : signalMap.entrySet()) {
 			List<Integer> signalList = entry.getValue();
+
+			if (signalList.size() > userLimit) {
+				signalList = signalList.subList(0, userLimit);
+			}
+
 			double sum = 0;
-			for (int d : signalList) {
+
+			for(int d: signalList){
 				sum += d;
 			}
 

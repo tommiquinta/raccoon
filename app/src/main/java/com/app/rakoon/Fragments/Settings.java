@@ -57,7 +57,6 @@ public class Settings extends PreferenceFragmentCompat {
 			}
 		});
 
-		// Imposta i summary con i valori salvati
 		int savedNumericValue = getNumericValue(requireContext());
 		int savedNumber = getNumber(requireContext());
 		numericPreference.setSummary(String.valueOf(savedNumericValue));
@@ -106,6 +105,4 @@ public class Settings extends PreferenceFragmentCompat {
 			number.setSummary(String.valueOf(savedNumber));
 		}
 	}
-
-
 }
