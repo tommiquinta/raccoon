@@ -1,30 +1,16 @@
 package com.app.rakoon;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoLte;
-import android.telephony.CellSignalStrengthLte;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
-import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.WifiEntry;
 import com.app.rakoon.Fragments.Settings;
 import com.app.rakoon.Helpers.VerticesHelper;
@@ -47,7 +33,6 @@ import mil.nga.mgrs.MGRS;
 public class WiFiActivity extends MapActivity{
 	private DatabaseHelper databaseHelper;
 	private static int accuracy;
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -9,8 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
-import com.app.rakoon.Database.SoundEntry;
-import com.app.rakoon.Database.WifiEntry;
 
 import java.util.List;
 

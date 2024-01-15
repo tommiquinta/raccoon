@@ -10,14 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="301b92a8-8e62-4cb5-bac3-01da47e5228a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/7.5/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/7.5/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/7.5/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/fileHashes/resourceHashesCache.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Fragments/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Fragments/Settings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Services/MyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Services/MyService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SignalActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SignalActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SoundActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SoundActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/WiFiActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/WiFiActivity.java" afterDir="false" />
@@ -28,7 +22,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[RZCT40NKK2P]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[/Users/tommaso/.android/avd/Pixel_6a_API_34.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />

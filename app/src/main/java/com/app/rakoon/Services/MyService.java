@@ -63,8 +63,7 @@ public class MyService extends Service {
 		public void onLocationResult(@NonNull LocationResult locationResult) {
 			super.onLocationResult(locationResult);
 			if (locationResult.getLastLocation() != null) {
-				double latitude = locationResult.getLastLocation().getLatitude();
-				double longitude = locationResult.getLastLocation().getLongitude();
+
 				Location location = locationResult.getLastLocation();
 
 				int signal;
@@ -81,7 +80,7 @@ public class MyService extends Service {
 
 				save(location, signal, wifi, sound);
 
-				Log.d("LOCATION_UPDATE", latitude + ", " + longitude + "\nSIGNAL: " + signal);
+				Log.d("LOCATION_UPDATE", locationResult.getLastLocation().getLatitude() + ", " + locationResult.getLastLocation().getLongitude() + "\nSIGNAL: " + signal);
 			}
 		}
 	};

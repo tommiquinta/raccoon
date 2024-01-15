@@ -1,15 +1,9 @@
 package com.app.rakoon;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoLte;
-import android.telephony.CellSignalStrengthLte;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 

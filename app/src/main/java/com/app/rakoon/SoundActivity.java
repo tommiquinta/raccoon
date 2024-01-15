@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -39,9 +38,6 @@ public class SoundActivity extends MapActivity {
 
 	// audio
 	private boolean isRecording = false;
-	private AudioRecord audioRecord;
-	private int bufferSize;
-	private short[] audioData;
 	private static int accuracy;
 	private DatabaseHelper databaseHelper;
 
@@ -52,9 +48,6 @@ public class SoundActivity extends MapActivity {
 
 		// button to record sound decibel
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
-
-		bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
-		audioData = new short[bufferSize];
 
 		getDecibel.setOnClickListener(v -> {
 			if (!isRecording) {
@@ -101,7 +94,7 @@ public class SoundActivity extends MapActivity {
 
 		for (SoundEntry entry : soundEntries) {
 			String MGRS = entry.getMGRS();
-			// mgrs for 10 meter squares
+
 			verticesHelper.setBottom_left(MGRS);
 			String sw = verticesHelper.getBottom_left();
 
@@ -114,7 +107,6 @@ public class SoundActivity extends MapActivity {
 		}
 
 		int userLimit = Settings.getNumber(getApplicationContext());
-		int limit = 0;
 
 		// Calculating the average decibel for each MGRS area
 		Map<String, Double> averageDecibels = new HashMap<>();
@@ -237,8 +229,6 @@ public class SoundActivity extends MapActivity {
 	private void stopRecording() {
 		if (isRecording) {
 			isRecording = false;
-			audioRecord.stop();
-			audioRecord.release();
 		}
 	}
 
