@@ -29,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
@@ -132,21 +133,26 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		mMap.clear();
 		Grids grids = Grids.create();
 
+		CameraPosition currentCameraPosition = mMap.getCameraPosition(); // Ottieni la posizione corrente della camera
+		LatLng currentLatLng = currentCameraPosition.target; // Ottieni la posizione corrente della mappa
+
+
+
 		tileProvider = MGRSTileProvider.create(this, grids);
 		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
 		if (accuracy == 10) {
 			grids.setWidth(GridType.TEN_METER, 1.0);
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 20F));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 20F));
 			mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
 			mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
 		} else if (accuracy == 100) {
 			grids.setWidth(GridType.HUNDRED_METER, 1.0);
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.5F));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.5F));
 			mMap.setMinZoomPreference(15.5F); // Set a preference for minimum zoom (Zoom out).
 			mMap.setMaxZoomPreference(17.5F); // Set a preference for maximum zoom (Zoom In).
 		} else if (accuracy == 1000) {
 			grids.setWidth(GridType.KILOMETER, 1.0);
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14.5F));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12.5F));
 			mMap.setMinZoomPreference(12F); // Set a preference for minimum zoom (Zoom out).
 			mMap.setMaxZoomPreference(15.5F); // Set a preference for maximum zoom (Zoom In).
 		}
