@@ -34,6 +34,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		String createSoundTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
 		db.execSQL(createSoundTableStatement);
+		String createSignalTableStatement = "CREATE TABLE " + SIGNAL_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + SIGNAL + " FLOAT, " + TIME + " TEXT)";
+		db.execSQL(createSignalTableStatement);
+		String createWiFiTableStatement = "CREATE TABLE " + WIFI_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + WIFI + " FLOAT, " + TIME + " TEXT)";
+		db.execSQL(createWiFiTableStatement);
 	}
 
 	// update the database if app gets updated, used for compatibility

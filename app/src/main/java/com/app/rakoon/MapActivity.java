@@ -136,8 +136,6 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		CameraPosition currentCameraPosition = mMap.getCameraPosition(); // Ottieni la posizione corrente della camera
 		LatLng currentLatLng = currentCameraPosition.target; // Ottieni la posizione corrente della mappa
 
-
-
 		tileProvider = MGRSTileProvider.create(this, grids);
 		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
 		if (accuracy == 10) {

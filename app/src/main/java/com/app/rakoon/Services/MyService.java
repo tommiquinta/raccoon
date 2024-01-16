@@ -9,19 +9,20 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
@@ -32,7 +33,6 @@ import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.WiFiHelper;
 import com.app.rakoon.R;
-import com.app.rakoon.SoundActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -42,6 +42,7 @@ import com.google.android.gms.location.Priority;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import mil.nga.mgrs.MGRS;
 
@@ -57,11 +58,15 @@ public class MyService extends Service {
 	SignalHelper signalHelper;
 	WiFiHelper wiFiHelper;
 	SoundHelper soundHelper;
+	List<SoundEntry> soundList;
+	List<SignalEntry> signalList;
+	List<WifiEntry> wifiList;
 
 	private final LocationCallback locationCallback = new LocationCallback() {
 		@Override
 		public void onLocationResult(@NonNull LocationResult locationResult) {
 			super.onLocationResult(locationResult);
+
 			if (locationResult.getLastLocation() != null) {
 
 				Location location = locationResult.getLastLocation();
@@ -80,10 +85,25 @@ public class MyService extends Service {
 
 				save(location, signal, wifi, sound);
 
+
 				Log.d("LOCATION_UPDATE", locationResult.getLastLocation().getLatitude() + ", " + locationResult.getLastLocation().getLongitude() + "\nSIGNAL: " + signal);
+				sendNotification();
 			}
 		}
 	};
+
+	private void sendNotification() {
+		NotificationCompat.Builder newNotificationBuilder = new NotificationCompat.Builder(getApplicationContext(), "new_location_notification_channel")
+				.setSmallIcon(R.drawable.ic_launcher_background)
+				.setContentTitle("My notification")
+				.setContentText("Much longer text that cannot fit one line...")
+				.setStyle(new NotificationCompat.BigTextStyle()
+						.bigText("Much longer text that cannot fit one line..."))
+				.setPriority(NotificationCompat.PRIORITY_MAX);
+
+		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+		notificationManager.notify(1, newNotificationBuilder.build());
+	}
 
 	@Nullable
 	@Override
@@ -117,8 +137,12 @@ public class MyService extends Service {
 	}
 
 	private void startLocationService() {
+		//Log.d("LISTA: ", soundList.get(0).getTime());
+
 		String channelId = "location_notification_channel";
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		createNotificationChannel();
 
 		Intent resultIntent = new Intent();
 		PendingIntent pendingIntent = getActivity(
@@ -164,6 +188,27 @@ public class MyService extends Service {
 		startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 	}
 
+	private void createNotificationChannel() {
+		// Create the NotificationChannel, but only on API 26+ because
+		// the NotificationChannel class is not in the Support Library.
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			CharSequence name = "new_location_notification_channel";
+			String description = "notifications for new area";
+			int importance = NotificationManager.IMPORTANCE_HIGH;
+			NotificationChannel channel = new NotificationChannel("new_location_notification_channel", name, importance);
+			channel.setDescription(description);
+			channel.setShowBadge(true);
+
+
+			// Register the channel with the system; you can't change the importance
+			// or other notification behaviors after this.
+			NotificationManager notificationManager = getSystemService(NotificationManager.class);
+			notificationManager.createNotificationChannel(channel);
+		}
+
+	}
+
 	public void getLocation() {
 
 		LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
@@ -202,6 +247,12 @@ public class MyService extends Service {
 		wiFiHelper = new WiFiHelper(getApplicationContext());
 		soundHelper = new SoundHelper(getApplicationContext());
 
+		DatabaseHelper dbService = new DatabaseHelper(this);
+
+		signalList = dbService.getSignals();
+		wifiList = dbService.getWiFi();
+		soundList = dbService.getSounds();
+
 		if (action != null) {
 			if (action.equals(Constants.ACTION_START_LOCATION_SERVICE)) {
 				startLocationService();
@@ -226,9 +277,22 @@ public class MyService extends Service {
 		}, 0); // start immediately after first call
 	}
 
+	PowerManager.WakeLock wakeLock;
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+				"MyApp::MyWakelockTag");
+		wakeLock.acquire();
+
+	}
+
 	@Override
 	public void onDestroy() {
 		handler.removeCallbacks(runnable);
 		super.onDestroy();
+		wakeLock.release();
+
 	}
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- GPS permissions -->
@@ -19,9 +19,10 @@
 
     <!-- Foreground and Notifications permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -70,11 +71,12 @@
             android:exported="false"
             android:label="@string/settings" />
 
-        <service android:name=".Services.MyService"
+        <service
+            android:name=".Services.MyService"
             android:enabled="true"
-            android:exported="false" />
-
-
+            android:exported="false"
+            android:foregroundServiceType="location|microphone" />
+        
         <!-- meta data per maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
