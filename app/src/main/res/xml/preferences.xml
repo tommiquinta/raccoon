@@ -6,22 +6,30 @@
 
         <SwitchPreferenceCompat
             android:id="@+id/switchSound"
-            app:key="SoundBG"
-            app:title="Sound Background Measurement" />
+            app:key="background"
+            app:title="Background Measurement" />
 
-        <SwitchPreferenceCompat
-            android:id="@+id/switchPreferenceCompat"
+        <CheckBoxPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="WiFiBG"
-            app:title="WiFi Background Measurement" />
+            app:key="Sound_bg"
+            app:title="Sound"
+            app:dependency="background" />
 
-        <SwitchPreferenceCompat
-            android:id="@+id/switchPreferenceCompat2"
+        <CheckBoxPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="SignalBG"
-            app:title="Enable message notifications" />
+            app:key="wifi_bg"
+            app:title="WiFi"
+            app:dependency="background" />
+
+        <CheckBoxPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="signal_bg"
+            app:title="Signal"
+            app:dependency="background" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Impostazioni">

@@ -55,33 +55,21 @@ public class SettingsActivity extends AppCompatActivity {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		listener = (sharedPreferences1, key) -> {
-			switch (key) {
-				case "SoundBG": {
-					boolean notificationsEnabled = sharedPreferences1.getBoolean("SoundBG", false);
+			if (key.equals("background")) {
+				boolean notificationsEnabled = sharedPreferences1.getBoolean("background", false);
 
-					if (notificationsEnabled) {
-						// Controlla anche il permesso di posizione in background prima di avviare il servizio
-						if (checkBackgroundLocationPermission()) {
-							startService(Constants.SOUND);
-						} else {
-							// Richiedi nuovamente il permesso di posizione in background o mostra un avviso all'utente
-							requestBackgroundLocationPermission();
-						}
+				if (notificationsEnabled) {
+					if (checkBackgroundLocationPermission()) {
+						startService();
 					} else {
-						stopService(Constants.SOUND);
+						requestBackgroundLocationPermission();
 					}
-					break;
-				}
-				case "WiFiBG": {
-					// ... (stessi controlli del caso "SoundBG")
-					break;
-				}
-				case "SignalBG": {
-					// ... (stessi controlli del caso "SoundBG")
-					break;
+				} else {
+					stopService();
 				}
 			}
 		};
+
 		sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
 
 		getSupportFragmentManager()
@@ -110,17 +98,17 @@ public class SettingsActivity extends AppCompatActivity {
 				REQUEST_CODE_BACKGROUND_LOCATION_PERMISSION);
 	}
 
-	public void startService(String type) {
+	public void startService() {
 		if (!isLocationServiceRunning()) {
 			Intent serviceIntent = new Intent(this, MyService.class);
 			serviceIntent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-			serviceIntent.putExtra("type", type);
+			serviceIntent.putExtra("type", "x");
 			startService(serviceIntent);
 			Toast.makeText(this, "Location Service Enabled", Toast.LENGTH_SHORT).show();
 		}
 	}
 
-	public void stopService(String type) {
+	public void stopService() {
 		if (isLocationServiceRunning()) {
 			Intent serviceIntent = new Intent(this, MyService.class);
 			serviceIntent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
@@ -137,7 +125,7 @@ public class SettingsActivity extends AppCompatActivity {
 			// Verifica se il permesso di posizione in background è stato concesso
 			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 				// Avvia il servizio quando il permesso è concesso
-				startService("x");
+				startService();
 			} else {
 				// Il permesso è stato negato, puoi gestire la situazione di conseguenza
 				Toast.makeText(this, "Permission denied. Please enable background location in your device settings.", Toast.LENGTH_SHORT).show();

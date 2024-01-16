@@ -12,6 +12,7 @@ public class Settings extends PreferenceFragmentCompat {
 
 	private static final String PREFERENCE_KEY = "numeric_preference";
 	private static final String NUMBER = "last_measurements";
+	private static final String SIGNAL = "signal_bg";
 
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -86,6 +87,11 @@ public class Settings extends PreferenceFragmentCompat {
 	public static int getNumber(Context context) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 		return sharedPreferences.getInt(NUMBER, 3);
+	}
+
+	public static boolean get_signal_bg(Context context){
+		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+		return sharedPreferences.getBoolean(SIGNAL, false);
 	}
 
 	@Override

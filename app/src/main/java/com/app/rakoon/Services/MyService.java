@@ -61,6 +61,7 @@ public class MyService extends Service {
 	List<SoundEntry> soundList;
 	List<SignalEntry> signalList;
 	List<WifiEntry> wifiList;
+	Boolean sound_bg;
 
 	private final LocationCallback locationCallback = new LocationCallback() {
 		@Override
@@ -71,11 +72,15 @@ public class MyService extends Service {
 
 				Location location = locationResult.getLastLocation();
 
-				int signal;
+				int signal = 150;
 				double wifi;
 				double sound;
+				Log.d("BOOLEAN", Boolean.toString(Settings.get_signal_bg(getApplicationContext())));
 
-				signal = signalHelper.getSignal();
+				if(Settings.get_signal_bg(getApplicationContext())){
+					signal = signalHelper.getSignal();
+				}
+
 				try {
 					wifi = wiFiHelper.getWiFi();
 				} catch (ParseException e) {
@@ -84,7 +89,6 @@ public class MyService extends Service {
 				sound = soundHelper.getSound();
 
 				save(location, signal, wifi, sound);
-
 
 				Log.d("LOCATION_UPDATE", locationResult.getLastLocation().getLatitude() + ", " + locationResult.getLastLocation().getLongitude() + "\nSIGNAL: " + signal);
 				sendNotification();
@@ -123,7 +127,6 @@ public class MyService extends Service {
 
 		WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
 		SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
-
 
 		dbService.addSignalEntry(signalEntry);
 		if (wifiEntry.getWifi() != 101) {
@@ -266,6 +269,7 @@ public class MyService extends Service {
 	private void repeat() {
 		handler.postDelayed(runnable = new Runnable() {
 			public void run() {
+				sound_bg = Settings.get_signal_bg(getApplicationContext());
 				Log.d("START", "partito");
 				getLocation();
 
