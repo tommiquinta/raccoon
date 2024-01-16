@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import androidx.preference.CheckBoxPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import com.app.rakoon.R;
@@ -19,6 +21,7 @@ public class Settings extends PreferenceFragmentCompat {
 		setPreferencesFromResource(R.xml.preferences, rootKey);
 		EditTextPreference numericPreference = findPreference(PREFERENCE_KEY);
 		EditTextPreference number = findPreference(NUMBER);
+		CheckBoxPreference signal_bg = findPreference(SIGNAL);
 
 		assert numericPreference != null;
 		numericPreference.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -32,6 +35,19 @@ public class Settings extends PreferenceFragmentCompat {
 				saveNumericValue(requireContext(), numericValue);
 				numericPreference.setSummary(String.valueOf(numericValue));
 				preference.setSummary(String.valueOf(numericValue));
+				return true;
+			} catch (NumberFormatException e) {
+				Toast.makeText(requireContext(), "Inserisci un numero intero valido", Toast.LENGTH_SHORT).show();
+				return false;
+			}
+		});
+
+		assert signal_bg != null;
+		signal_bg.setOnPreferenceChangeListener((preference, newValue) -> {
+			try {
+				boolean signal = (boolean) newValue;
+
+				saveSignal(requireContext(), signal);
 				return true;
 			} catch (NumberFormatException e) {
 				Toast.makeText(requireContext(), "Inserisci un numero intero valido", Toast.LENGTH_SHORT).show();
@@ -63,15 +79,12 @@ public class Settings extends PreferenceFragmentCompat {
 		numericPreference.setSummary(String.valueOf(savedNumericValue));
 		number.setSummary(String.valueOf(savedNumber));
 	}
-
-
 	private static void saveNumericValue(Context context, int numericValue) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putInt(PREFERENCE_KEY, numericValue);
 		editor.apply();
 	}
-
 	private static void saveNumber(Context context, int numericValue) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -79,6 +92,12 @@ public class Settings extends PreferenceFragmentCompat {
 		editor.apply();
 	}
 
+	private static void saveSignal(Context context, boolean signal) {
+		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putBoolean(SIGNAL, signal);
+		editor.apply();
+	}
 	public static int getNumericValue(Context context) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 		return sharedPreferences.getInt(PREFERENCE_KEY, 3);

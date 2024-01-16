@@ -75,7 +75,7 @@ public class MyService extends Service {
 				int signal = 150;
 				double wifi;
 				double sound;
-				Log.d("BOOLEAN", Boolean.toString(Settings.get_signal_bg(getApplicationContext())));
+				Log.d("booleano",String.valueOf(Settings.get_signal_bg(getApplicationContext())));
 
 				if(Settings.get_signal_bg(getApplicationContext())){
 					signal = signalHelper.getSignal();
@@ -269,7 +269,6 @@ public class MyService extends Service {
 	private void repeat() {
 		handler.postDelayed(runnable = new Runnable() {
 			public void run() {
-				sound_bg = Settings.get_signal_bg(getApplicationContext());
 				Log.d("START", "partito");
 				getLocation();
 
