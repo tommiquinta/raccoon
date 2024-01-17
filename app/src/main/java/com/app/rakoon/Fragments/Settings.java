@@ -9,19 +9,22 @@ import androidx.preference.CheckBoxPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import com.app.rakoon.R;
+import com.app.rakoon.Services.Constants;
 
 public class Settings extends PreferenceFragmentCompat {
 
 	private static final String PREFERENCE_KEY = "numeric_preference";
 	private static final String NUMBER = "last_measurements";
-	private static final String SIGNAL = "signal_bg";
 
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 		setPreferencesFromResource(R.xml.preferences, rootKey);
 		EditTextPreference numericPreference = findPreference(PREFERENCE_KEY);
 		EditTextPreference number = findPreference(NUMBER);
-		CheckBoxPreference signal_bg = findPreference(SIGNAL);
+
+		CheckBoxPreference signal_bg = findPreference(Constants.SIGNAL);
+		CheckBoxPreference sound_bg = findPreference(Constants.SOUND);
+		CheckBoxPreference wifi_bg = findPreference(Constants.WIFI);
 
 		assert numericPreference != null;
 		numericPreference.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -46,11 +49,32 @@ public class Settings extends PreferenceFragmentCompat {
 		signal_bg.setOnPreferenceChangeListener((preference, newValue) -> {
 			try {
 				boolean signal = (boolean) newValue;
-
-				saveSignal(requireContext(), signal);
+				save_boolean(requireContext(), signal, Constants.SIGNAL);
 				return true;
 			} catch (NumberFormatException e) {
-				Toast.makeText(requireContext(), "Inserisci un numero intero valido", Toast.LENGTH_SHORT).show();
+				return false;
+			}
+		});
+
+		assert sound_bg != null;
+		sound_bg.setOnPreferenceChangeListener((preference, newValue) -> {
+			try {
+				boolean sound = (boolean) newValue;
+				save_boolean(requireContext(), sound, Constants.SOUND);
+				return true;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		});
+
+		assert wifi_bg != null;
+		wifi_bg.setOnPreferenceChangeListener((preference, newValue) -> {
+			try {
+				boolean wifi = (boolean) newValue;
+
+				save_boolean(requireContext(), wifi, Constants.WIFI);
+				return true;
+			} catch (NumberFormatException e) {
 				return false;
 			}
 		});
@@ -92,12 +116,6 @@ public class Settings extends PreferenceFragmentCompat {
 		editor.apply();
 	}
 
-	private static void saveSignal(Context context, boolean signal) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPreferences.edit();
-		editor.putBoolean(SIGNAL, signal);
-		editor.apply();
-	}
 	public static int getNumericValue(Context context) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 		return sharedPreferences.getInt(PREFERENCE_KEY, 3);
@@ -108,9 +126,16 @@ public class Settings extends PreferenceFragmentCompat {
 		return sharedPreferences.getInt(NUMBER, 3);
 	}
 
-	public static boolean get_signal_bg(Context context){
+	private static void save_boolean(Context context, boolean bool, String type) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-		return sharedPreferences.getBoolean(SIGNAL, false);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putBoolean(type, bool);
+		editor.apply();
+	}
+
+	public static boolean get_boolean_bg(Context context, String type){
+		SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+		return sharedPreferences.getBoolean(type, false);
 	}
 
 	@Override

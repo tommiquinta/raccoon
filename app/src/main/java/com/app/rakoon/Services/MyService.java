@@ -19,7 +19,6 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -38,6 +37,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -73,20 +74,25 @@ public class MyService extends Service {
 				Location location = locationResult.getLastLocation();
 
 				int signal = 150;
-				double wifi;
-				double sound;
-				Log.d("booleano",String.valueOf(Settings.get_signal_bg(getApplicationContext())));
+				double wifi = 150;
+				double sound = -10;
+				Log.d("booleano", String.valueOf(Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)));
 
-				if(Settings.get_signal_bg(getApplicationContext())){
+				if (Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
 					signal = signalHelper.getSignal();
 				}
 
-				try {
-					wifi = wiFiHelper.getWiFi();
-				} catch (ParseException e) {
-					throw new RuntimeException(e);
+				if (Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
+					try {
+						wifi = wiFiHelper.getWiFi();
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
 				}
-				sound = soundHelper.getSound();
+
+				if (Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND)) {
+					sound = soundHelper.getSound();
+				}
 
 				save(location, signal, wifi, sound);
 
@@ -116,27 +122,45 @@ public class MyService extends Service {
 	}
 
 	public void save(Location location, int signal, double wifi, double sound) {
-		DatabaseHelper dbService = new DatabaseHelper(this);
+		if (!noneIsChecked()) {
+			DatabaseHelper dbService = new DatabaseHelper(this);
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
-		String time = sdf.format(new Date());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
+			String time = sdf.format(new Date());
 
-		MGRS mgrs = MGRS.from(location.getLongitude(), location.getLatitude());
+			MGRS mgrs = MGRS.from(location.getLongitude(), location.getLatitude());
 
-		SignalEntry signalEntry = new SignalEntry(mgrs.toString(), signal, time);
+			if (Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
+				SignalEntry signalEntry = new SignalEntry(mgrs.toString(), signal, time);
+				dbService.addSignalEntry(signalEntry);
+				Log.d("SALVATO_SEGNALE: ", "TRUE");
 
-		WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
-		SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
+			}
 
-		dbService.addSignalEntry(signalEntry);
-		if (wifiEntry.getWifi() != 101) {
-			dbService.addWifiEntry(wifiEntry);
+			if (Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
+				WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
+				if (wifiEntry.getWifi() != 101) {
+					dbService.addWifiEntry(wifiEntry);
+					Log.d("SALVATO_WIFI: ", "TRUE");
+
+				}
+			}
+
+			if (Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND)) {
+				SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
+				if (soundEntry.getDecibel() != Double.POSITIVE_INFINITY) {
+					dbService.addSoundEntry(soundEntry);
+					Log.d("SALVATO_SUONO: ", "TRUE");
+
+				}
+			}
+
+			Log.d("SALVATO: ", "TRUE");
 		}
+	}
 
-		if (soundEntry.getDecibel() != Double.POSITIVE_INFINITY) {
-			dbService.addSoundEntry(soundEntry);
-		}
-		Log.d("SALVATO: ", "TRUE");
+	private boolean noneIsChecked() {
+		return !Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND) && !Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI) && !Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL);
 	}
 
 	private void startLocationService() {
@@ -281,6 +305,7 @@ public class MyService extends Service {
 	}
 
 	PowerManager.WakeLock wakeLock;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();

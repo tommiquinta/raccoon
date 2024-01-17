@@ -5,8 +5,8 @@ public class Constants {
 	public static final String ACTION_START_LOCATION_SERVICE = "startLocationService";
 	public static final String ACTION_STOP_LOCATION_SERVICE = "stopLocationService";
 
-	public static final String SIGNAL = "Signal";
-	public static final String SOUND = "Sound";
-	public static final String WIFI = "WIFI";
+	public static final String SIGNAL = "signal_bg";
+	public static final String SOUND = "Sound_bg";
+	public static final String WIFI = "wifi_bg";
 
 }

@@ -13,40 +13,40 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:key="Sound_bg"
-            app:title="Sound"
-            app:dependency="background" />
+            app:title="Sound" />
+        <!--app:dependency="background" /> -->
 
         <CheckBoxPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:key="wifi_bg"
-            app:title="WiFi"
-            app:dependency="background" />
+            app:title="WiFi" />
+        <!--app:dependency="background" /> -->
 
         <CheckBoxPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:key="signal_bg"
-            app:title="Signal"
-            app:dependency="background" />
+            app:title="Signal" />
+        <!--app:dependency="background" /> -->
 
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Impostazioni">
         <EditTextPreference
-            android:key="numeric_preference"
-            android:title="Minutes between measurements"
-            android:summary="3"
+            android:defaultValue="3"
             android:inputType="phone"
-            android:defaultValue="3" />
+            android:key="numeric_preference"
+            android:summary="3"
+            android:title="Minutes between measurements" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Map">
         <EditTextPreference
-            android:key="last_measurements"
-            android:title="Number of last measurements"
-            android:summary="3"
+            android:defaultValue="3"
             android:inputType="numberPassword"
-            android:defaultValue="3" />
+            android:key="last_measurements"
+            android:summary="3"
+            android:title="Number of last measurements" />
     </PreferenceCategory>
 </PreferenceScreen>
