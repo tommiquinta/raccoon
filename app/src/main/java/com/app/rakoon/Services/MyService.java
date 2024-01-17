@@ -24,6 +24,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
+import com.app.rakoon.Database.Entry;
 import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Database.WifiEntry;
@@ -62,7 +63,6 @@ public class MyService extends Service {
 	List<SoundEntry> soundList;
 	List<SignalEntry> signalList;
 	List<WifiEntry> wifiList;
-	Boolean sound_bg;
 
 	private final LocationCallback locationCallback = new LocationCallback() {
 		@Override
@@ -76,7 +76,6 @@ public class MyService extends Service {
 				int signal = 150;
 				double wifi = 150;
 				double sound = -10;
-				Log.d("booleano", String.valueOf(Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)));
 
 				if (Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
 					signal = signalHelper.getSignal();
@@ -94,7 +93,11 @@ public class MyService extends Service {
 					sound = soundHelper.getSound();
 				}
 
-				save(location, signal, wifi, sound);
+				try {
+					save(location, signal, wifi, sound);
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
 
 				Log.d("LOCATION_UPDATE", locationResult.getLastLocation().getLatitude() + ", " + locationResult.getLastLocation().getLongitude() + "\nSIGNAL: " + signal);
 				sendNotification();
@@ -121,7 +124,7 @@ public class MyService extends Service {
 		throw new UnsupportedOperationException("Not implemented");
 	}
 
-	public void save(Location location, int signal, double wifi, double sound) {
+	public void save(Location location, int signal, double wifi, double sound) throws ParseException {
 		if (!noneIsChecked()) {
 			DatabaseHelper dbService = new DatabaseHelper(this);
 
@@ -133,15 +136,14 @@ public class MyService extends Service {
 			if (Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
 				SignalEntry signalEntry = new SignalEntry(mgrs.toString(), signal, time);
 				dbService.addSignalEntry(signalEntry);
-				Log.d("SALVATO_SEGNALE: ", "TRUE");
-
+				check_signal_zone(signalEntry);
 			}
 
 			if (Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
 				WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
 				if (wifiEntry.getWifi() != 101) {
 					dbService.addWifiEntry(wifiEntry);
-					Log.d("SALVATO_WIFI: ", "TRUE");
+					//checkZone(wifiEntry);
 
 				}
 			}
@@ -150,17 +152,33 @@ public class MyService extends Service {
 				SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
 				if (soundEntry.getDecibel() != Double.POSITIVE_INFINITY) {
 					dbService.addSoundEntry(soundEntry);
-					Log.d("SALVATO_SUONO: ", "TRUE");
-
+					//checkZone(soundEntry);
 				}
 			}
-
-			Log.d("SALVATO: ", "TRUE");
+		} else {
+			Log.d("chiuso", "tutto chiuso");
 		}
 	}
 
 	private boolean noneIsChecked() {
 		return !Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND) && !Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI) && !Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL);
+	}
+
+	private void check_signal_zone(SignalEntry entry) throws ParseException {
+		String mgrs = entry.getMGRS();
+		Date sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm").parse(entry.getTime());
+		String new_mgrs = mgrs.substring(0, 8) + mgrs.substring(10, 13);    // 100 meter zone
+
+		for(SignalEntry s: signalList){
+			String old_mgrs = s.getMGRS();
+			String hunder_mgrs = old_mgrs.substring(0, 8) + old_mgrs.substring(10, 13);
+			if(hunder_mgrs.equals(new_mgrs)){
+				Log.d("AREA:", "questa are è già stat visitata");
+			} else {
+				Log.d("ARE", "questa a re è nuova");
+			}
+		}
+
 	}
 
 	private void startLocationService() {
@@ -209,16 +227,11 @@ public class MyService extends Service {
 				notificationManager.createNotificationChannel(notificationChannel);
 			}
 		}
-
 		repeat();
-
 		startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
 	}
 
 	private void createNotificationChannel() {
-		// Create the NotificationChannel, but only on API 26+ because
-		// the NotificationChannel class is not in the Support Library.
-
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			CharSequence name = "new_location_notification_channel";
 			String description = "notifications for new area";
@@ -227,9 +240,6 @@ public class MyService extends Service {
 			channel.setDescription(description);
 			channel.setShowBadge(true);
 
-
-			// Register the channel with the system; you can't change the importance
-			// or other notification behaviors after this.
 			NotificationManager notificationManager = getSystemService(NotificationManager.class);
 			notificationManager.createNotificationChannel(channel);
 		}
@@ -243,13 +253,6 @@ public class MyService extends Service {
 				.build();
 
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
 			return;
 		}
 		LocationServices.getFusedLocationProviderClient(this)
@@ -301,7 +304,7 @@ public class MyService extends Service {
 
 				handler.postDelayed(this, delayMillis);
 			}
-		}, 0); // start immediately after first call
+		}, 5000);
 	}
 
 	PowerManager.WakeLock wakeLock;
@@ -313,7 +316,6 @@ public class MyService extends Service {
 		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				"MyApp::MyWakelockTag");
 		wakeLock.acquire();
-
 	}
 
 	@Override
@@ -321,6 +323,5 @@ public class MyService extends Service {
 		handler.removeCallbacks(runnable);
 		super.onDestroy();
 		wakeLock.release();
-
 	}
 }

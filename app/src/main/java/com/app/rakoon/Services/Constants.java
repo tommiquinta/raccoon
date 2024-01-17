@@ -8,5 +8,4 @@ public class Constants {
 	public static final String SIGNAL = "signal_bg";
 	public static final String SOUND = "Sound_bg";
 	public static final String WIFI = "wifi_bg";
-
 }
