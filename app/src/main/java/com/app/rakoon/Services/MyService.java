@@ -100,22 +100,31 @@ public class MyService extends Service {
 				}
 
 				Log.d("LOCATION_UPDATE", locationResult.getLastLocation().getLatitude() + ", " + locationResult.getLastLocation().getLongitude() + "\nSIGNAL: " + signal);
-				sendNotification();
 			}
 		}
 	};
 
-	private void sendNotification() {
+	private void sendNotification(boolean new_area, String type, int id) {
+
+		String title = "New " + type + " measurement!";
+		String context = "Who's back?";
+		String bigText = "You just made a " + type + "measurement in area that you didn't visit for the past 24 hours.";
+		if (new_area) {
+			title = "Good job!";
+			context = "New " + type + " zone discovered.";
+			bigText = "You just made a " + type + " measurement in a 100 meter zone where you have never been before.";
+		}
 		NotificationCompat.Builder newNotificationBuilder = new NotificationCompat.Builder(getApplicationContext(), "new_location_notification_channel")
 				.setSmallIcon(R.drawable.ic_launcher_background)
-				.setContentTitle("My notification")
-				.setContentText("Much longer text that cannot fit one line...")
+				.setContentTitle(title)
+				.setContentText(context)
 				.setStyle(new NotificationCompat.BigTextStyle()
-						.bigText("Much longer text that cannot fit one line..."))
+						.bigText(bigText))
 				.setPriority(NotificationCompat.PRIORITY_MAX);
 
 		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-		notificationManager.notify(1, newNotificationBuilder.build());
+		notificationManager.notify(id, newNotificationBuilder.build());
+
 	}
 
 	@Nullable
@@ -136,25 +145,26 @@ public class MyService extends Service {
 			if (Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
 				SignalEntry signalEntry = new SignalEntry(mgrs.toString(), signal, time);
 				dbService.addSignalEntry(signalEntry);
-				check_signal_zone(signalEntry);
-			}
-
-			if (Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
-				WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
-				if (wifiEntry.getWifi() != 101) {
-					dbService.addWifiEntry(wifiEntry);
-					//checkZone(wifiEntry);
-
-				}
+				check_zone(signalEntry);
 			}
 
 			if (Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND)) {
 				SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
 				if (soundEntry.getDecibel() != Double.POSITIVE_INFINITY) {
 					dbService.addSoundEntry(soundEntry);
-					//checkZone(soundEntry);
+					check_zone(soundEntry);
 				}
 			}
+
+			if (Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
+				WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
+				if (wifiEntry.getWifi() != 101) {
+					dbService.addWifiEntry(wifiEntry);
+					check_zone(wifiEntry);
+				}
+			}
+
+
 		} else {
 			Log.d("chiuso", "tutto chiuso");
 		}
@@ -164,19 +174,44 @@ public class MyService extends Service {
 		return !Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND) && !Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI) && !Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL);
 	}
 
-	private void check_signal_zone(SignalEntry entry) throws ParseException {
+	private void check_zone(Entry entry) throws ParseException {
 		String mgrs = entry.getMGRS();
 		Date sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm").parse(entry.getTime());
 		String new_mgrs = mgrs.substring(0, 8) + mgrs.substring(10, 13);    // 100 meter zone
+		String type = "x";
+		List<? extends Entry> entryList = null;
+		int id =0;
+		if (entry instanceof SignalEntry) {
+			type = "Signal";
+			entryList = signalList;
+			id = 1;
+		} else if (entry instanceof SoundEntry) {
+			type = "Sound";
+			entryList = soundList;
+			id = 2;
+		} else if (entry instanceof WifiEntry) {
+			type = "WiFi";
+			entryList = wifiList;
+			id = 3;
+		}
 
-		for(SignalEntry s: signalList){
+
+		for (Entry s : entryList) {
 			String old_mgrs = s.getMGRS();
 			String hunder_mgrs = old_mgrs.substring(0, 8) + old_mgrs.substring(10, 13);
-			if(hunder_mgrs.equals(new_mgrs)){
+			Date old_date = new SimpleDateFormat("yyyy-MM-dd, HH:mm").parse(s.getTime());
+
+			if (hunder_mgrs.equals(new_mgrs)) {
 				Log.d("AREA:", "questa are è già stat visitata");
+				if (sdf.getTime() - old_date.getTime() > 24 * 60 * 60 * 1000) {
+					sendNotification(false, type, id);
+					break;
+				}
 			} else {
+				sendNotification(true, type, id);
 				Log.d("ARE", "questa a re è nuova");
 			}
+			break;
 		}
 
 	}
