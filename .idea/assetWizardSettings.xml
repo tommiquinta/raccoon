@@ -68,7 +68,8 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="0" />
+                                                <entry key="imagePath" value="$APPLICATION_HOME_DIR$/plugins/android/resources/images/asset_studio/sound-2-svgrepo-com.svg" />
+                                                <entry key="scalingPercent" value="20" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -93,7 +94,8 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="$USER_HOME$/Downloads/raccoon logo 1.png" />
-                                                <entry key="scalingPercent" value="89" />
+                                                <entry key="scalingPercent" value="101" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -126,7 +128,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="legacyIconShape" value="CIRCLE" />
-                                      <entry key="outputName" value="raccon_icon" />
+                                      <entry key="outputName" value="raccon_icon_logo" />
+                                      <entry key="showGrid" value="true" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -290,6 +293,11 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="showGrid" value="true" />
                                     </map>
                                   </option>
                                 </PersistentState>

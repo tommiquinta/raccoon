@@ -4,7 +4,7 @@
     <string name="your_data">Your data</string>
 
     <string name="welcome_to_rakoon">Welcome to Rakoon!</string>
-    <string name="sound_map">Sound Map</string>
+    <string name="sound_map">Noise Map</string>
     <string name="title_activity_map">MapActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -20,5 +20,5 @@
     <string name="welcome_to_raccoon">Welcome to Raccoon!</string>
     <string name="data_size_message" />
     <string name="settings">your settings</string>
-    <string name="signal_map">Signal Map\n</string>
+    <string name="signal_map">Signal Map</string>
 </resources>

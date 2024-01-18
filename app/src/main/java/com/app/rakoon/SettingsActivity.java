@@ -25,7 +25,6 @@ public class SettingsActivity extends AppCompatActivity {
 	private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
 	private static final int REQUEST_CODE_BACKGROUND_LOCATION_PERMISSION = 2;
 
-
 	private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
 	private boolean isLocationServiceRunning() {

@@ -7,69 +7,71 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- in the onClick filed goes the name of the moethod in MainActivity-->
-    <TextView
-        android:id="@+id/welcomeTxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
-        android:text="Welcome to Raccoon!"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
         android:id="@+id/createSoundMapButton"
-        android:layout_width="wrap_content"
-        android:layout_height="55dp"
-        android:layout_marginTop="28dp"
-        android:onClick="onToSoundClick"
+        android:layout_width="136dp"
+        android:layout_height="195dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/rectangle_1"
+        android:gravity="bottom|end"
         android:text="@string/sound_map"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        android:textAppearance="@style/ButtonTextStyle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeTxt" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="10dp"/>
 
     <Button
         android:id="@+id/createWiFiMapButton"
-        android:layout_width="107dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="132dp"
+        android:layout_width="136dp"
+        android:layout_height="195dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="40dp"
+        android:background="@drawable/rectangle_1"
+        android:gravity="bottom|end"
         android:text="@string/wi_fi_map"
+        android:textAppearance="@style/ButtonTextStyle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeTxt" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="10dp"/>
 
     <Button
         android:id="@+id/createSignalMapButton"
-        android:layout_width="107dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="132dp"
+        android:layout_width="136dp"
+        android:layout_height="195dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/rectangle_1"
+        android:gravity="bottom|end"
         android:text="@string/signal_map"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
+        android:textAppearance="@style/ButtonTextStyle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createWiFiMapButton" />
+        app:layout_constraintTop_toBottomOf="@+id/createSoundMapButton"
+        android:padding="10dp"/>
+
 
     <Button
         android:id="@+id/data"
-        android:layout_width="107dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="420dp"
+        android:layout_width="136dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/rectangle_1"
         android:text="@string/your_data"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textAppearance="@style/ButtonTextStyle2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeTxt" />
+        app:layout_constraintTop_toBottomOf="@+id/createSignalMapButton" />
 
     <Button
         android:id="@+id/settings"
-        android:layout_width="107dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="136dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="40dp"
+        android:background="@drawable/rectangle_1"
+        android:textAppearance="@style/ButtonTextStyle2"
         android:text="@string/settings"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/data" />
+        app:layout_constraintTop_toBottomOf="@+id/createSignalMapButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

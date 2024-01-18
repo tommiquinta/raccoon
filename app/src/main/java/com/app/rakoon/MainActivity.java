@@ -12,12 +12,15 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.app.rakoon.Services.MyService;
+
+import java.util.Objects;
 
 //import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,6 +31,11 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+
+		Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+		getSupportActionBar().setCustomView(R.layout.custom_action_bar);
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			requestPermissions();
 		}

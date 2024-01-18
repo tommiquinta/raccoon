@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.WifiEntry;
@@ -26,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
@@ -37,6 +39,10 @@ public class WiFiActivity extends MapActivity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+		getSupportActionBar().setCustomView(R.layout.wifi_action_bar);
+
 		databaseHelper = new DatabaseHelper(WiFiActivity.this);
 
 		// button to record sound decibel

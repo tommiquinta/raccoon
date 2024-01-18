@@ -28,7 +28,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/raccon_icon_round"
+        android:icon="@mipmap/raccon_icon_no_bg_foreground"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Raccoon"
@@ -39,12 +39,14 @@
             android:label="@string/title_activity_map" />
         <activity
             android:name=".MainActivity"
+            android:label="Raccon"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".YourDataActivity"
@@ -59,7 +61,8 @@
         <activity
             android:name=".SignalActivity"
             android:exported="false"
-            android:label="@string/settings" />
+            android:label="@string/signal_map"
+            />
 
         <activity
             android:name=".WiFiActivity"

@@ -139,7 +139,7 @@ public class MyService extends Service {
 		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
 		NotificationCompat.Builder newNotificationBuilder = new NotificationCompat.Builder(getApplicationContext(), "new_location_notification_channel")
-				.setSmallIcon(R.mipmap.raccon_icon_round)
+				.setSmallIcon(R.mipmap.raccon_icon_logo_foreground)
 				.setContentTitle(title)
 				.setContentText(context)
 				.setStyle(new NotificationCompat.BigTextStyle()
@@ -276,7 +276,7 @@ public class MyService extends Service {
 				channelId
 		);
 
-		builder.setSmallIcon(R.mipmap.raccon_icon_round);
+		builder.setSmallIcon(R.mipmap.raccon_icon_logo_round);
 		builder.setContentTitle("Raccoon Service");
 		builder.setDefaults(NotificationCompat.DEFAULT_ALL);
 		builder.setContentText("Running");
