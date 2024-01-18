@@ -49,7 +49,6 @@ public class SettingsActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings_layout);
 
-		// Richiedi il permesso delle notifiche quando la pagina viene aperta
 		askNotificationPermission();
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -117,29 +116,20 @@ public class SettingsActivity extends AppCompatActivity {
 		}
 	}
 
-	// Gestisci la risposta alla richiesta dei permessi
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 		if (requestCode == REQUEST_CODE_BACKGROUND_LOCATION_PERMISSION) {
-			// Verifica se il permesso di posizione in background è stato concesso
 			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 				// Avvia il servizio quando il permesso è concesso
 				startService();
 			} else {
-				// Il permesso è stato negato, puoi gestire la situazione di conseguenza
 				Toast.makeText(this, "Permission denied. Please enable background location in your device settings.", Toast.LENGTH_SHORT).show();
 			}
 		} else if (requestCode == REQUEST_CODE_NOTIFICATION_PERMISSION) {
-			// Gestisci la risposta al permesso delle notifiche se necessario
+
 		}
 	}
 
 
-
-	// Metodo chiamato quando il pulsante è premuto per richiedere il permesso di posizione in background
-	public void onRequestBackgroundLocationPermissionClicked(View view) {
-		// Richiedi il permesso di posizione in background quando il pulsante è premuto
-		requestBackgroundLocationPermission();
-	}
 }

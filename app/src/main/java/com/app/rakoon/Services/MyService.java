@@ -139,14 +139,14 @@ public class MyService extends Service {
 		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
 		NotificationCompat.Builder newNotificationBuilder = new NotificationCompat.Builder(getApplicationContext(), "new_location_notification_channel")
-				.setSmallIcon(R.drawable.ic_launcher_background)
+				.setSmallIcon(R.mipmap.raccon_icon_round)
 				.setContentTitle(title)
 				.setContentText(context)
 				.setStyle(new NotificationCompat.BigTextStyle()
 						.bigText(bigText))
 				.setPriority(NotificationCompat.PRIORITY_MAX)
+				.setAutoCancel(true)
 				.setContentIntent(pIntent);
-
 
 		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
 		notificationManager.notify(id, newNotificationBuilder.build());
@@ -276,7 +276,7 @@ public class MyService extends Service {
 				channelId
 		);
 
-		builder.setSmallIcon(R.mipmap.ic_launcher);
+		builder.setSmallIcon(R.mipmap.raccon_icon_round);
 		builder.setContentTitle("Raccoon Service");
 		builder.setDefaults(NotificationCompat.DEFAULT_ALL);
 		builder.setContentText("Running");
@@ -347,7 +347,7 @@ public class MyService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		String action = intent.getAction();
 
-		signalHelper = SignalHelper.getInstance(getApplicationContext());
+		signalHelper = new SignalHelper(getApplicationContext());
 		wiFiHelper = new WiFiHelper(getApplicationContext());
 		soundHelper = new SoundHelper(getApplicationContext());
 

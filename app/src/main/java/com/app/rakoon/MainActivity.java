@@ -32,14 +32,6 @@ public class MainActivity extends AppCompatActivity {
 			requestPermissions();
 		}
 
-		/**
-		 *
-		 * testins the service
-		 */
-
-		/**
-		 * sound map activity
-		 */
 		Button btnGoToSoundActivity = findViewById(R.id.createSoundMapButton);
 
 		btnGoToSoundActivity.setOnClickListener(v -> {
@@ -91,11 +83,6 @@ public class MainActivity extends AppCompatActivity {
 			startActivity(intent);
 		});
 
-	}
-
-	// Check if notifications permissions are granted to the application
-	private boolean checkPermissions() {
-		return ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 	}
 
 	// Request permissions if not granted before

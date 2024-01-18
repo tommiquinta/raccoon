@@ -56,7 +56,7 @@ public class SignalActivity extends MapActivity {
 
 
 	private void getSignal() throws ParseException {
-		SignalHelper signalHelper = SignalHelper.getInstance(this);
+		SignalHelper signalHelper =new SignalHelper(this);
 		int signalLevel = signalHelper.getSignal();
 		saveInDatabase(signalLevel);
 		Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();

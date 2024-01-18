@@ -13,18 +13,10 @@ import androidx.core.app.ActivityCompat;
 import java.util.List;
 
 public class SignalHelper {
-	private static SignalHelper instance;
 	private final Context context;
 
-	private SignalHelper(Context context) {
+	public SignalHelper(Context context) {
 		this.context = context;
-	}
-
-	public static SignalHelper getInstance(Context context) {
-		if (instance == null) {
-			instance = new SignalHelper(context.getApplicationContext());
-		}
-		return instance;
 	}
 
 	public int getSignal() {
