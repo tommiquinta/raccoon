@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">rakoon</string>
+    <string name="app_name">raccoon</string>
     <string name="wi_fi_map">Wi-fi map</string>
     <string name="your_data">Your data</string>
 
-    <string name="welcome_to_rakoon">Welcome to Rakoon!</string>
+    <string name="welcome_to_rakoon">Welcome to Raccoon!</string>
     <string name="sound_map">Noise Map</string>
     <string name="title_activity_map">MapActivity</string>
     <!-- Strings used for fragments for navigation -->

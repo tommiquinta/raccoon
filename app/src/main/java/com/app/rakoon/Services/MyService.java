@@ -119,7 +119,7 @@ public class MyService extends Service {
 		}
 
 		// open map when a notification is clicked
-		Intent intent = null;
+		Intent intent = new Intent(this, SettingsActivity.class);
 		switch (type) {
 			case "Signal": {
 				intent = new Intent(this, SignalActivity.class);
