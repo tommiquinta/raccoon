@@ -33,6 +33,10 @@ import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.WiFiHelper;
 import com.app.rakoon.R;
+import com.app.rakoon.SettingsActivity;
+import com.app.rakoon.SignalActivity;
+import com.app.rakoon.SoundActivity;
+import com.app.rakoon.WiFiActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -63,7 +67,6 @@ public class MyService extends Service {
 	List<SoundEntry> soundList;
 	List<SignalEntry> signalList;
 	List<WifiEntry> wifiList;
-
 	private final LocationCallback locationCallback = new LocationCallback() {
 		@Override
 		public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -108,23 +111,45 @@ public class MyService extends Service {
 
 		String title = "New " + type + " measurement!";
 		String context = "Who's back?";
-		String bigText = "You just made a " + type + "measurement in area that you didn't visit for the past 24 hours.";
+		String bigText = "You just made a " + type + " measurement in area that you didn't visit for the past 24 hours.";
 		if (new_area) {
 			title = "Good job!";
 			context = "New " + type + " zone discovered.";
 			bigText = "You just made a " + type + " measurement in a 100 meter zone where you have never been before.";
 		}
+
+		// open map when a notification is clicked
+		Intent intent = null;
+		switch (type) {
+			case "Signal": {
+				intent = new Intent(this, SignalActivity.class);
+				break;
+			}
+			case "WiFI": {
+				intent = new Intent(this, WiFiActivity.class);
+				break;
+			}
+			case "Sound": {
+				intent = new Intent(this, SoundActivity.class);
+				break;
+			}
+		}
+
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
 		NotificationCompat.Builder newNotificationBuilder = new NotificationCompat.Builder(getApplicationContext(), "new_location_notification_channel")
 				.setSmallIcon(R.drawable.ic_launcher_background)
 				.setContentTitle(title)
 				.setContentText(context)
 				.setStyle(new NotificationCompat.BigTextStyle()
 						.bigText(bigText))
-				.setPriority(NotificationCompat.PRIORITY_MAX);
+				.setPriority(NotificationCompat.PRIORITY_MAX)
+				.setContentIntent(pIntent);
+
 
 		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
 		notificationManager.notify(id, newNotificationBuilder.build());
-
 	}
 
 	@Nullable
@@ -164,7 +189,6 @@ public class MyService extends Service {
 				}
 			}
 
-
 		} else {
 			Log.d("chiuso", "tutto chiuso");
 		}
@@ -180,7 +204,7 @@ public class MyService extends Service {
 		String new_mgrs = mgrs.substring(0, 8) + mgrs.substring(10, 13);    // 100 meter zone
 		String type = "x";
 		List<? extends Entry> entryList = null;
-		int id =0;
+		int id = 0;
 		if (entry instanceof SignalEntry) {
 			type = "Signal";
 			entryList = signalList;
@@ -195,6 +219,10 @@ public class MyService extends Service {
 			id = 3;
 		}
 
+		if (entryList.isEmpty()) {
+			sendNotification(true, type, id);
+			return;
+		}
 
 		for (Entry s : entryList) {
 			String old_mgrs = s.getMGRS();
@@ -209,11 +237,18 @@ public class MyService extends Service {
 				}
 			} else {
 				sendNotification(true, type, id);
-				Log.d("ARE", "questa a re è nuova");
+				Log.d("ARE", "questa are a è nuova");
 			}
 			break;
 		}
 
+		if (entry instanceof SignalEntry) {
+			signalList.add((SignalEntry) entry);
+		} else if (entry instanceof SoundEntry) {
+			soundList.add((SoundEntry) entry);
+		} else if (entry instanceof WifiEntry) {
+			wifiList.add((WifiEntry) entry);
+		}
 	}
 
 	private void startLocationService() {
@@ -232,6 +267,10 @@ public class MyService extends Service {
 				PendingIntent.FLAG_IMMUTABLE
 		);
 
+		Intent intent = new Intent(this, SettingsActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				getApplicationContext(),
 				channelId
@@ -246,6 +285,7 @@ public class MyService extends Service {
 		builder.setOngoing(true);
 		builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 		builder.setPriority(NotificationCompat.PRIORITY_MAX);
+		builder.setContentIntent(pIntent);
 
 		builder.setDeleteIntent(null);
 
@@ -282,7 +322,6 @@ public class MyService extends Service {
 	}
 
 	public void getLocation() {
-
 		LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
 				.setMaxUpdates(1)   // very important
 				.build();
