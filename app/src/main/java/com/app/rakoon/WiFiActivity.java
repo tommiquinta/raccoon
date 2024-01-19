@@ -64,7 +64,7 @@ public class WiFiActivity extends MapActivity{
 		if(signalStrength == 101){  // wifi error
 			Toast.makeText(this, "No WiFi network Available.", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(this, "Wifi status: " + getDescription(signalStrength), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Wifi Level: " + getDescription(signalStrength), Toast.LENGTH_SHORT).show();
 			saveInDatabaseAsync(signalStrength);
 		}
 	}

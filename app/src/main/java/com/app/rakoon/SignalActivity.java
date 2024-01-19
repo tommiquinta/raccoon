@@ -63,11 +63,20 @@ public class SignalActivity extends MapActivity {
 
 
 	private void getSignal() throws ParseException {
-		SignalHelper signalHelper =new SignalHelper(this);
+		SignalHelper signalHelper = new SignalHelper(this);
 		int signalLevel = signalHelper.getSignal();
+		Toast.makeText(this, "Signal Level: " + getDescription(signalLevel), Toast.LENGTH_SHORT).show();
 		saveInDatabase(signalLevel);
-		Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
-		saveInDatabase(signalLevel);
+	}
+
+	private String getDescription(int s) {
+		if (s >= 3.5) {
+			return "Good";
+		} else if (s < 3.5 && s >= 1) {
+			return "Medium";
+		} else {
+			return "Bad";
+		}
 	}
 
 	// method to wait for map to be loaded
@@ -82,6 +91,7 @@ public class SignalActivity extends MapActivity {
 	}
 
 	List<SignalEntry> signals;
+
 	@Override
 	public void fetchData() throws ParseException {
 		accuracy = super.getAccuracy();
@@ -127,7 +137,7 @@ public class SignalActivity extends MapActivity {
 
 			double sum = 0;
 
-			for(int d: signalList){
+			for (int d : signalList) {
 				sum += d;
 			}
 
@@ -201,7 +211,7 @@ public class SignalActivity extends MapActivity {
 		}
 	}
 
-	private void saveInDatabase(int signal) throws ParseException {
+	private void saveInDatabase(int signal) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
 		String time = sdf.format(new Date());
 
@@ -214,7 +224,9 @@ public class SignalActivity extends MapActivity {
 		DatabaseHelper databaseHelper = new DatabaseHelper(SignalActivity.this);
 
 		boolean success = databaseHelper.addSignalEntry(signalEntry);
-		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
+
+		//Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
+
 		if (success) {
 			List<SignalEntry> newSignal = new ArrayList<>();
 			newSignal.add(signalEntry);
@@ -224,17 +236,17 @@ public class SignalActivity extends MapActivity {
 				newSignal = newSignal.subList(0, userLimit);
 			}
 
-			for(SignalEntry s: signals){
-				if(s.getMGRS().equals(mgrs_1)){
+			for (SignalEntry s : signals) {
+				if (s.getMGRS().equals(mgrs_1)) {
 					newSignal.add(s);
 				}
 			}
 			double total = 0;
 
-			for(SignalEntry s: newSignal){
+			for (SignalEntry s : newSignal) {
 				total += s.getSignal();
 			}
-			double average = total/newSignal.size();
+			double average = total / newSignal.size();
 
 			try {
 				colorMap(new SignalEntry(mgrs_1, average));
