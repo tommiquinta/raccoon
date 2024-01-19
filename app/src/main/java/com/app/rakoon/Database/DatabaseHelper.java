@@ -214,4 +214,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			return false;
 		}
 	}
+
+	public void deleteSunds(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(SOUND_DATA, null, null);
+		db.close();
+	}
+	public void deleteWifi(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(WIFI_DATA, null, null);
+		db.close();
+	}
+	public void deleteSignal() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(SIGNAL_DATA, null, null);
+		db.close();
+	}
 }

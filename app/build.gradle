@@ -57,4 +57,7 @@ dependencies {
 
     api 'mil.nga.mgrs:mgrs-android:2.2.2'
 
+    implementation 'com.opencsv:opencsv:5.2'
+
+
 }

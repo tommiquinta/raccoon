@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -43,11 +44,9 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	private FusedLocationProviderClient mFusedLocationClient;
 	GoogleMap mMap;
 	LatLng currentLocation;
-
 	private int accuracy = 10;
 
 	private DatabaseHelper databaseHelper;
-
 	/**
 	 * MGRS tile provider
 	 */
@@ -266,5 +265,18 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		if (requestCode == PERMISSION_ID && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 			getLastLocation();
 		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
 	}
 }

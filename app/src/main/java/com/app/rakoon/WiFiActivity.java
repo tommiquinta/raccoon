@@ -1,5 +1,6 @@
 package com.app.rakoon;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -213,6 +214,19 @@ public class WiFiActivity extends MapActivity{
 				poly.fillColor(Color.rgb(255, 0, 0));
 			}
 			mMap.addPolygon(poly);
+
+			mMap.setOnMapClickListener(arg0 -> {
+				Log.d("arg0", arg0.latitude + "-" + arg0.longitude);
+				double latitude = arg0.latitude;
+				double longitude = arg0.longitude;
+				Intent intent = new Intent(WiFiActivity.this, AllDataActivity.class);
+				intent.putExtra("latitude", String.valueOf(latitude));
+				intent.putExtra("longitude", String.valueOf(longitude));
+				intent.putExtra("TYPE", "WIFI_DATA");
+				intent.putExtra("accuracy", String.valueOf(accuracy));
+				startActivity(intent);
+			});
+
 
 		} catch (ParseException e) {
 			throw new RuntimeException(e);

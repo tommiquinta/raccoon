@@ -1,6 +1,7 @@
 package com.app.rakoon;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioFormat;
@@ -191,6 +192,18 @@ public class SoundActivity extends MapActivity {
 			}
 
 			mMap.addPolygon(poly);
+			mMap.setOnMapClickListener(arg0 -> {
+				Log.d("arg0", arg0.latitude + "-" + arg0.longitude);
+				double latitude = arg0.latitude;
+				double longitude = arg0.longitude;
+				Intent intent = new Intent(SoundActivity.this, AllDataActivity.class);
+				intent.putExtra("latitude", String.valueOf(latitude));
+				intent.putExtra("longitude", String.valueOf(longitude));
+				intent.putExtra("TYPE", "SOUND_DATA");
+				intent.putExtra("accuracy", String.valueOf(accuracy));
+				startActivity(intent);
+			});
+
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}

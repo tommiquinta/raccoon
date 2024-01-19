@@ -12,9 +12,6 @@ import com.app.rakoon.R;
 import com.app.rakoon.Services.Constants;
 
 public class mySettings extends PreferenceFragmentCompat {
-
-	public static final String ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS = "ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS";
-	public static final String ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS = "2";
 	private static final String PREFERENCE_KEY = "numeric_preference";
 	private static final String NUMBER = "last_measurements";
 
