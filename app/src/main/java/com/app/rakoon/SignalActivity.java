@@ -14,7 +14,8 @@ import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
-import com.app.rakoon.Fragments.Settings;
+import com.app.rakoon.Database.WifiEntry;
+import com.app.rakoon.Fragments.mySettings;
 import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,10 +44,10 @@ public class SignalActivity extends MapActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		databaseHelper = new DatabaseHelper(SignalActivity.this);
+		isPhonePermissionGranted();
 
 		Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		getSupportActionBar().setCustomView(R.layout.signal_action_bar);
-
 
 		// button to record sound decibel
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
@@ -80,12 +81,12 @@ public class SignalActivity extends MapActivity {
 		}
 	}
 
-
+	List<SignalEntry> signals;
 	@Override
 	public void fetchData() throws ParseException {
 		accuracy = super.getAccuracy();
 
-		List<SignalEntry> signals = databaseHelper.getSignals();
+		signals = databaseHelper.getSignals();
 		Map<String, Double> averageSignals;
 		averageSignals = calculateSignalAverages(signals);
 
@@ -113,7 +114,7 @@ public class SignalActivity extends MapActivity {
 			signalMap.get(sw).add(signal);
 		}
 
-		int userLimit = Settings.getNumber(getApplicationContext());
+		int userLimit = mySettings.getNumber(getApplicationContext());
 
 		// Calculating the average signal for each MGRS area
 		Map<String, Double> averageSignals = new HashMap<>();
@@ -215,16 +216,38 @@ public class SignalActivity extends MapActivity {
 		boolean success = databaseHelper.addSignalEntry(signalEntry);
 		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 		if (success) {
-			fetchData();
+			List<SignalEntry> newSignal = new ArrayList<>();
+			newSignal.add(signalEntry);
+			int userLimit = mySettings.getNumber(getApplicationContext());
+
+			if (newSignal.size() > userLimit) {
+				newSignal = newSignal.subList(0, userLimit);
+			}
+
+			for(SignalEntry s: signals){
+				if(s.getMGRS().equals(mgrs_1)){
+					newSignal.add(s);
+				}
+			}
+			double total = 0;
+
+			for(SignalEntry s: newSignal){
+				total += s.getSignal();
+			}
+			double average = total/newSignal.size();
+
+			try {
+				colorMap(new SignalEntry(mgrs_1, average));
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
-	private boolean isPhonePermissionGranted() {
+	private void isPhonePermissionGranted() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 1);
-			return false;
 		}
-		return true;
 	}
 }
 

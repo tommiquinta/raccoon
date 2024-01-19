@@ -32,7 +32,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Impostazioni">
+    <PreferenceCategory android:title="Background Settings">
         <EditTextPreference
             android:defaultValue="3"
             android:inputType="phone"

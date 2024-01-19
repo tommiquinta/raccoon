@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -42,7 +43,8 @@ public class SoundHelper {
 			}
 
 			double amplitude = getAmplitude();
-			db = 30 * Math.log10(amplitude);
+			Log.d("AMPLITUDE", String.valueOf(amplitude));
+			db = 20 * Math.log10(amplitude);
 			stopRecording();
 
 			return Math.floor(db * 100) / 100;

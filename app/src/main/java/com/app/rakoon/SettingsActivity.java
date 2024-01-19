@@ -6,25 +6,32 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
-import com.app.rakoon.Fragments.Settings;
+import com.app.rakoon.Fragments.mySettings;
 import com.app.rakoon.Services.Constants;
 import com.app.rakoon.Services.MyService;
+
+import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
 
 	private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
 	private static final int REQUEST_CODE_BACKGROUND_LOCATION_PERMISSION = 2;
-
 	private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
 	private boolean isLocationServiceRunning() {
@@ -47,6 +54,9 @@ public class SettingsActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings_layout);
+
+		Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+		getSupportActionBar().setCustomView(R.layout.settings_custom_bar);
 
 		askNotificationPermission();
 
@@ -72,9 +82,11 @@ public class SettingsActivity extends AppCompatActivity {
 
 		getSupportFragmentManager()
 				.beginTransaction()
-				.replace(R.id.settings_container, new Settings())
+				.replace(R.id.settings_container, new mySettings())
 				.commit();
 	}
+
+
 
 	private void askNotificationPermission() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -110,7 +122,7 @@ public class SettingsActivity extends AppCompatActivity {
 		if (isLocationServiceRunning()) {
 			Intent serviceIntent = new Intent(this, MyService.class);
 			serviceIntent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
-			startService(serviceIntent);
+			stopService(serviceIntent);
 			Toast.makeText(this, "Location Service Disabled", Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -120,15 +132,10 @@ public class SettingsActivity extends AppCompatActivity {
 
 		if (requestCode == REQUEST_CODE_BACKGROUND_LOCATION_PERMISSION) {
 			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				// Avvia il servizio quando il permesso è concesso
 				startService();
 			} else {
 				Toast.makeText(this, "Permission denied. Please enable background location in your device settings.", Toast.LENGTH_SHORT).show();
 			}
-		} else if (requestCode == REQUEST_CODE_NOTIFICATION_PERMISSION) {
-
 		}
 	}
-
-
 }

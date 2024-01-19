@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SoundEntry;
-import com.app.rakoon.Fragments.Settings;
+import com.app.rakoon.Fragments.mySettings;
 import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.google.android.gms.maps.GoogleMap;
@@ -77,13 +77,13 @@ public class SoundActivity extends MapActivity {
 			throw new RuntimeException(e);
 		}
 	}
-
+	List<SoundEntry> sounds;
 	@Override
 	public void fetchData() throws ParseException {
 
 		accuracy = super.getAccuracy();
 
-		List<SoundEntry> sounds = databaseHelper.getSounds();
+		sounds = databaseHelper.getSounds();
 
 		Map<String, Double> averageDecibels;
 		averageDecibels = calculateDecibelAverages(sounds);
@@ -112,7 +112,7 @@ public class SoundActivity extends MapActivity {
 			decibelMap.get(sw).add(decibel);
 		}
 
-		int userLimit = Settings.getNumber(getApplicationContext());
+		int userLimit = mySettings.getNumber(getApplicationContext());
 
 		// Calculating the average decibel for each MGRS area
 		Map<String, Double> averageDecibels = new HashMap<>();
@@ -203,8 +203,8 @@ public class SoundActivity extends MapActivity {
 			}
 			SoundHelper soundHelper = new SoundHelper(this);
 			double sound = soundHelper.getSound();
-			displayDecibel(sound);
-			if(sound != Double.POSITIVE_INFINITY) {
+			if(sound != Double.POSITIVE_INFINITY && sound != Double.NEGATIVE_INFINITY) {
+				displayDecibel(sound);
 				saveInDatabase(sound);
 			}
 		}
@@ -226,9 +226,29 @@ public class SoundActivity extends MapActivity {
 		DatabaseHelper databaseHelper = new DatabaseHelper(SoundActivity.this);
 
 		boolean success = databaseHelper.addSoundEntry(soundEntry);
-		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 		if (success) {
-			this.fetchData();
+			List<SoundEntry> newSounds = new ArrayList<>();
+			newSounds.add(soundEntry);
+			int userLimit = mySettings.getNumber(getApplicationContext());
+
+			if (newSounds.size() > userLimit) {
+				newSounds = newSounds.subList(0, userLimit);
+			}
+
+			for(SoundEntry s: sounds){
+				if(s.getMGRS().equals(mgrs_1)){
+					newSounds.add(s);
+				}
+			}
+			double total = 0;
+
+			for(SoundEntry s: newSounds){
+				total += s.getDecibel();
+			}
+			double average = total/newSounds.size();
+
+			colorMap(new SoundEntry(mgrs_1, average));
 		}
 	}
 

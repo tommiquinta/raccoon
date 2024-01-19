@@ -10,6 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="301b92a8-8e62-4cb5-bac3-01da47e5228a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/settings_custom_bar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.5/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.5/fileHashes/fileHashes.bin" afterDir="false" />
@@ -18,15 +19,27 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Fragments/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Fragments/mySettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Helpers/SoundHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Helpers/SoundHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/MapActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/MapActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Services/MyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/Services/MyService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SettingsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SettingsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SignalActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SignalActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SoundActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/SoundActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/WiFiActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/WiFiActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/YourDataActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/app/rakoon/YourDataActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/sound_icon_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/sound_icon_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/sound_icon_foreground.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/sound_icon_foreground.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/settings_layout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/settings_layout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/xml/preferences.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/xml/preferences.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[/Users/tommaso/.android/avd/Pixel_6a_API_34.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[RZCT40NKK2P]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -36,10 +49,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
-        <option value="Class" />
         <option value="resourceFile" />
         <option value="valueResourceFile" />
         <option value="layoutResourceFile" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -70,6 +83,7 @@
     &quot;ToolWindowDevice Explorer.ShowToolbar&quot;: &quot;false&quot;,
     &quot;android-custom-view/Users/tommaso/Library/Android/sdk/sources/android-33/android/widget/RelativeLayout.java_SELECTED&quot;: &quot;RelativeLayout&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.android.tools.idea.devicemanager.tab&quot;: &quot;Physical&quot;,
     &quot;com.android.tools.idea.emulator.zoom.toolbar.visible&quot;: &quot;false&quot;,
     &quot;com.android.tools.idea.streaming.emulator.zoom.toolbar.visible&quot;: &quot;false&quot;,
     &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,

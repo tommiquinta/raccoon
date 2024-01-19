@@ -28,7 +28,7 @@ import com.app.rakoon.Database.Entry;
 import com.app.rakoon.Database.SignalEntry;
 import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Database.WifiEntry;
-import com.app.rakoon.Fragments.Settings;
+import com.app.rakoon.Fragments.mySettings;
 import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.WiFiHelper;
@@ -73,6 +73,11 @@ public class MyService extends Service {
 			super.onLocationResult(locationResult);
 
 			if (locationResult.getLastLocation() != null) {
+				DatabaseHelper dbService = new DatabaseHelper(getApplicationContext());
+
+				signalList = dbService.getSignals();
+				wifiList = dbService.getWiFi();
+				soundList = dbService.getSounds();
 
 				Location location = locationResult.getLastLocation();
 
@@ -80,11 +85,11 @@ public class MyService extends Service {
 				double wifi = 150;
 				double sound = -10;
 
-				if (Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
+				if (mySettings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
 					signal = signalHelper.getSignal();
 				}
 
-				if (Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
+				if (mySettings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
 					try {
 						wifi = wiFiHelper.getWiFi();
 					} catch (ParseException e) {
@@ -92,7 +97,7 @@ public class MyService extends Service {
 					}
 				}
 
-				if (Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND)) {
+				if (mySettings.get_boolean_bg(getApplicationContext(), Constants.SOUND)) {
 					sound = soundHelper.getSound();
 				}
 
@@ -167,21 +172,21 @@ public class MyService extends Service {
 
 			MGRS mgrs = MGRS.from(location.getLongitude(), location.getLatitude());
 
-			if (Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
+			if (mySettings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL)) {
 				SignalEntry signalEntry = new SignalEntry(mgrs.toString(), signal, time);
 				dbService.addSignalEntry(signalEntry);
 				check_zone(signalEntry);
 			}
 
-			if (Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND)) {
+			if (mySettings.get_boolean_bg(getApplicationContext(), Constants.SOUND)) {
 				SoundEntry soundEntry = new SoundEntry(mgrs.toString(), sound, time);
-				if (soundEntry.getDecibel() != Double.POSITIVE_INFINITY) {
+				if (soundEntry.getDecibel() != Double.POSITIVE_INFINITY && soundEntry.getDecibel() != Double.NEGATIVE_INFINITY) {
 					dbService.addSoundEntry(soundEntry);
 					check_zone(soundEntry);
 				}
 			}
 
-			if (Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
+			if (mySettings.get_boolean_bg(getApplicationContext(), Constants.WIFI)) {
 				WifiEntry wifiEntry = new WifiEntry(mgrs.toString(), wifi, time);
 				if (wifiEntry.getWifi() != 101) {
 					dbService.addWifiEntry(wifiEntry);
@@ -195,7 +200,7 @@ public class MyService extends Service {
 	}
 
 	private boolean noneIsChecked() {
-		return !Settings.get_boolean_bg(getApplicationContext(), Constants.SOUND) && !Settings.get_boolean_bg(getApplicationContext(), Constants.WIFI) && !Settings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL);
+		return !mySettings.get_boolean_bg(getApplicationContext(), Constants.SOUND) && !mySettings.get_boolean_bg(getApplicationContext(), Constants.WIFI) && !mySettings.get_boolean_bg(getApplicationContext(), Constants.SIGNAL);
 	}
 
 	private void check_zone(Entry entry) throws ParseException {
@@ -240,14 +245,6 @@ public class MyService extends Service {
 				Log.d("ARE", "questa are a è nuova");
 			}
 			break;
-		}
-
-		if (entry instanceof SignalEntry) {
-			signalList.add((SignalEntry) entry);
-		} else if (entry instanceof SoundEntry) {
-			soundList.add((SoundEntry) entry);
-		} else if (entry instanceof WifiEntry) {
-			wifiList.add((WifiEntry) entry);
 		}
 	}
 
@@ -373,7 +370,7 @@ public class MyService extends Service {
 				Log.d("START", "partito");
 				getLocation();
 
-				int delayMillis = Settings.getNumericValue(getApplicationContext()) * 60000;
+				int delayMillis = mySettings.getNumericValue(getApplicationContext()) * 60000;
 				Log.d("MINUTI", String.valueOf(delayMillis));
 
 				handler.postDelayed(this, delayMillis);
@@ -389,12 +386,18 @@ public class MyService extends Service {
 		PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				"MyApp::MyWakelockTag");
-		wakeLock.acquire();
+		wakeLock.acquire(100*60*1000L);
 	}
 
 	@Override
 	public void onDestroy() {
 		handler.removeCallbacks(runnable);
+		soundList = null;
+		wifiList = null;
+		signalList = null;
+		wiFiHelper = null;
+		signalHelper = null;
+		soundHelper = null;
 		super.onDestroy();
 		wakeLock.release();
 	}

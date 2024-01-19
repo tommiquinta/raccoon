@@ -12,8 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 
 import com.app.rakoon.Database.DatabaseHelper;
+import com.app.rakoon.Database.SoundEntry;
 import com.app.rakoon.Database.WifiEntry;
-import com.app.rakoon.Fragments.Settings;
+import com.app.rakoon.Fragments.mySettings;
 import com.app.rakoon.Helpers.VerticesHelper;
 import com.app.rakoon.Helpers.WiFiHelper;
 import com.google.android.gms.maps.GoogleMap;
@@ -63,10 +64,20 @@ public class WiFiActivity extends MapActivity{
 		if(signalStrength == 101){  // wifi error
 			Toast.makeText(this, "No WiFi network Available.", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(this, "Wifi Strength: " + signalStrength, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Wifi status: " + getDescription(signalStrength), Toast.LENGTH_SHORT).show();
 			saveInDatabaseAsync(signalStrength);
 		}
-	};
+	}
+
+	private String getDescription(double signal){
+		if (signal >= -60) {
+			return "Good";
+		} else if (signal<-60 && signal >= -90) {
+			return "Medium";
+		} else {
+			return "Bad";
+		}
+	}
 
 	// method to wait for map to be loaded
 	@Override
@@ -75,12 +86,14 @@ public class WiFiActivity extends MapActivity{
 		this.fetchData();
 	}
 
+	List<WifiEntry> wifis;
+
 	@Override
 	public void fetchData() {
 		new Thread(() -> {
 			try {
 				accuracy = super.getAccuracy();
-				List<WifiEntry> wifis = databaseHelper.getWiFi();
+				wifis = databaseHelper.getWiFi();
 				Map<String, Double> averageWifis;
 				averageWifis = calculateSignalAverages(wifis);
 
@@ -118,8 +131,7 @@ public class WiFiActivity extends MapActivity{
 			signalMap.get(sw).add(signal);
 		}
 
-		int userLimit = Settings.getNumber(getApplicationContext());
-		int limit = 0;
+		int userLimit = mySettings.getNumber(getApplicationContext());
 
 		// Calculating the average singal for each MGRS area
 		Map<String, Double> averageSignals = new HashMap<>();
@@ -133,7 +145,7 @@ public class WiFiActivity extends MapActivity{
 			double sum = 0;
 
 			for(double d: signalList){
-				Log.d("signal: ", String.valueOf(d));
+				//Log.d("signal: ", String.valueOf(d));
 				sum += d;
 			}
 
@@ -222,9 +234,33 @@ public class WiFiActivity extends MapActivity{
 			final boolean success = databaseHelper.addWifiEntry(wifiEntry);
 
 			runOnUiThread(() -> {
-				Toast.makeText(WiFiActivity.this, "Saved: " + success, Toast.LENGTH_SHORT).show();
+				//Toast.makeText(WiFiActivity.this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 				if (success) {
-					fetchData();
+					List<WifiEntry> newWiFi = new ArrayList<>();
+					newWiFi.add(wifiEntry);
+					int userLimit = mySettings.getNumber(getApplicationContext());
+
+					if (newWiFi.size() > userLimit) {
+						newWiFi = newWiFi.subList(0, userLimit);
+					}
+
+					for(WifiEntry s: wifis){
+						if(s.getMGRS().equals(mgrs_1)){
+							newWiFi.add(s);
+						}
+					}
+					double total = 0;
+
+					for(WifiEntry s: newWiFi){
+						total += s.getWifi();
+					}
+					double average = total/newWiFi.size();
+
+					try {
+						colorMap(new WifiEntry(mgrs_1, average));
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			});
 		}).start();
