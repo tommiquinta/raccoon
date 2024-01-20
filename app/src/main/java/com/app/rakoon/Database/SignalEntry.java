@@ -4,14 +4,10 @@ public class SignalEntry implements Entry {
 	int signal_id;
 	String MGRS;
 	int signal;
-
 	double signalAvg;
-
 	String timeString;
-
 	public SignalEntry() {
 	}
-
 	public SignalEntry(String MGRS, int signal, String timeString) {
 		this.MGRS = MGRS;
 		this.signal = signal;
@@ -34,6 +30,7 @@ public class SignalEntry implements Entry {
 		this.MGRS = MGRS;
 		this.signalAvg = signalAvg;
 	}
+
 	public int getSignal_id() {
 		return this.signal_id;
 	}
@@ -56,15 +53,10 @@ public class SignalEntry implements Entry {
 	public String getMGRS() {
 		return MGRS;
 	}
-
-
 	@Override
 	public String toString() {
 		return
-				"ID=" + signal_id +
-						", MGRS=" + MGRS +
-						", SIGNAL=" + signal +
-						", TIME= " + timeString;
+				"Signal = " + signal + ", \nDate: " + timeString;
 	}
 
 	public double getSignalAVG() {

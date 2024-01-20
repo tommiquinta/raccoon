@@ -6,10 +6,23 @@
     android:gravity="center"
     android:orientation="vertical">
 
-
     <ListView
         android:id="@+id/data_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/no_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="@style/ButtonTextStyle2"
+        android:textAlignment="center"
+        android:text="No data for this zone."
+        android:visibility="invisible"
+
+
+    />
 
 </RelativeLayout>

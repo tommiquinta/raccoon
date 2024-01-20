@@ -4,4 +4,5 @@ public interface Entry {
 	int getId();
 	String getMGRS();
 	String getTime();
+	String toString();
 }

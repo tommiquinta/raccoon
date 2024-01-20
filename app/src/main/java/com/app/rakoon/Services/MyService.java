@@ -33,10 +33,10 @@ import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.SoundHelper;
 import com.app.rakoon.Helpers.WiFiHelper;
 import com.app.rakoon.R;
-import com.app.rakoon.SettingsActivity;
-import com.app.rakoon.SignalActivity;
-import com.app.rakoon.SoundActivity;
-import com.app.rakoon.WiFiActivity;
+import com.app.rakoon.Activities.SettingsActivity;
+import com.app.rakoon.Activities.SignalActivity;
+import com.app.rakoon.Activities.SoundActivity;
+import com.app.rakoon.Activities.WiFiActivity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -195,7 +195,7 @@ public class MyService extends Service {
 			}
 
 		} else {
-			Log.d("chiuso", "tutto chiuso");
+			Log.d("closed", "all closed");
 		}
 	}
 
@@ -385,7 +385,7 @@ public class MyService extends Service {
 		super.onCreate();
 		PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-				"MyApp::MyWakelockTag");
+				"raccoon::MyWakelockTag");
 		wakeLock.acquire(100*60*1000L);
 	}
 

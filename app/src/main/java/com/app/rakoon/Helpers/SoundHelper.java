@@ -27,7 +27,6 @@ public class SoundHelper {
 
 	public double getSound() {
 		if (isMicrophonePermissionGranted()) {
-
 			if (ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 				return 0;
 			}

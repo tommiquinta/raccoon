@@ -49,11 +49,7 @@ public class WifiEntry implements Entry {
 
 	@Override
 	public String toString() {
-		return
-				"ID=" + wifi_id +
-						", MGRS=" + MGRS +
-						", WIFI=" + wifi +
-						", TIME= " + timeString;
+		return "Signal = " + wifi + ", \nDate: " + timeString;
 	}
 
 }

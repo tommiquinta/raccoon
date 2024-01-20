@@ -14,7 +14,6 @@ import java.util.List;
 
 // this is the DAO class, the one that will do all the operations
 public class DatabaseHelper extends SQLiteOpenHelper {
-
 	public static final String SOUND_DATA = "SOUND_DATA";
 	public static final String SIGNAL_DATA = "SIGNAL_DATA";
 	public static final String WIFI_DATA = "WIFI_DATA";
@@ -178,7 +177,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return wifiData;
 	}
 
-	// DELETE ONE SOUND ENTRY
+	public void deleteOne(Entry entry) {
+		if (entry instanceof SignalEntry) {
+			deleteOne((SignalEntry) entry);
+		} else if (entry instanceof SoundEntry) {
+			deleteOne((SoundEntry) entry);
+		} else if (entry instanceof WifiEntry) {
+			deleteOne((WifiEntry) entry);
+		}
+	}
+
+		// DELETE ONE SOUND ENTRY
 	public boolean deleteOne(SoundEntry soundEntry) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String query = "DELETE FROM " + SOUND_DATA + " WHERE  " + ID + " = " + soundEntry.getId();

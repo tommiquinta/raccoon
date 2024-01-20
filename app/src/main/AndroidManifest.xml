@@ -34,11 +34,11 @@
         android:theme="@style/Theme.Raccoon"
         tools:targetApi="31">
         <activity
-            android:name=".SoundActivity"
+            android:name=".Activities.SoundActivity"
             android:exported="false"
             android:label="@string/title_activity_map" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:label="Raccon"
             android:exported="true">
             <intent-filter>
@@ -49,33 +49,33 @@
 
         </activity>
         <activity
-            android:name=".YourDataActivity"
+            android:name=".Activities.MyDataActivity"
             android:exported="false"
             android:label="@string/your_data" />
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Activities.SettingsActivity"
             android:exported="false"
             android:label="@string/settings" />
 
         <activity
-            android:name=".SignalActivity"
+            android:name=".Activities.SignalActivity"
             android:exported="false"
             android:label="@string/signal_map"
             />
 
         <activity
-            android:name=".WiFiActivity"
+            android:name=".Activities.WiFiActivity"
             android:exported="false"
             android:label="@string/wi_fi_map" />
 
         <activity
-            android:name=".MapActivity"
+            android:name=".Activities.MapActivity"
             android:exported="false"
             android:label="@string/settings" />
 
         <activity
-            android:name=".AllDataActivity"
+            android:name=".Fragments.AllDataFragment"
             android:exported="false"
             android:label="@string/your_data" />
 
