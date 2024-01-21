@@ -1,25 +1,28 @@
-package com.app.rakoon;
+package com.app.rakoon.Activities;
 
 import android.Manifest;
-import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoLte;
-import android.telephony.CellSignalStrengthLte;
-import android.telephony.TelephonyManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.SignalEntry;
+import com.app.rakoon.Fragments.AllDataFragment;
+import com.app.rakoon.Fragments.mySettings;
+import com.app.rakoon.Helpers.SignalHelper;
 import com.app.rakoon.Helpers.VerticesHelper;
+import com.app.rakoon.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -31,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
@@ -41,58 +45,48 @@ public class SignalActivity extends MapActivity {
 	private DatabaseHelper databaseHelper;
 	private static int accuracy;
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		databaseHelper = new DatabaseHelper(SignalActivity.this);
+		isPhonePermissionGranted();
 
+		Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+		getSupportActionBar().setCustomView(R.layout.signal_action_bar);
 
 		// button to record sound decibel
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
 
 		getDecibel.setOnClickListener(v -> {
-			try {
-				getSignal();
-			} catch (ParseException e) {
-				throw new RuntimeException(e);
+			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+				try {
+					getSignal();
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				Toast.makeText(this, "Location not available.", Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
 
 
 	private void getSignal() throws ParseException {
-		if (isPhonePermissionGranted()) {
-			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
-				return;
-			}
-			TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-			List<CellInfo> cellInfoList = telephonyManager.getAllCellInfo();
-			CellInfoLte cellInfoLte = null;
-
-			for (CellInfo cellInfo : cellInfoList) {
-				if (cellInfo instanceof CellInfoLte) {
-					cellInfoLte = (CellInfoLte) cellInfo;
-					break;
-				}
-			}
-
-			int signalStrength = 0;
-			int signalLevel = 0;
-			if (cellInfoLte != null) {
-				CellSignalStrengthLte signalStrengthLte = cellInfoLte.getCellSignalStrength();
-				signalStrength = signalStrengthLte.getDbm();
-				signalLevel = signalStrengthLte.getLevel();
-
-				saveInDatabase(signalLevel);
-			}
-
-			Toast.makeText(this, "signalLevel: " + signalLevel, Toast.LENGTH_SHORT).show();
-
-		}
+		SignalHelper signalHelper = new SignalHelper(this);
+		int signalLevel = signalHelper.getSignal();
+		Toast.makeText(this, "Signal Level: " + getDescription(signalLevel), Toast.LENGTH_SHORT).show();
+		saveInDatabase(signalLevel);
 	}
 
+	private String getDescription(int s) {
+		if (s >= 3) {
+			return "Good";
+		} else if (s < 3 && s >= 1) {
+			return "Medium";
+		} else {
+			return "Bad";
+		}
+	}
 
 	// method to wait for map to be loaded
 	@Override
@@ -105,20 +99,33 @@ public class SignalActivity extends MapActivity {
 		}
 	}
 
+	List<SignalEntry> signals;
 
 	@Override
 	public void fetchData() throws ParseException {
-		accuracy = super.getAccuracy();
+		new Thread(() -> {
+			try {
+				accuracy = super.getAccuracy();
 
-		List<SignalEntry> signals = databaseHelper.getSignals();
-		Map<String, Double> averageSignals;
-		averageSignals = calculateSignalAverages(signals);
+				signals = databaseHelper.getSignals();
 
-		for (Map.Entry<String, Double> s : averageSignals.entrySet()) {
-			SignalEntry se = new SignalEntry(s.getKey(), s.getValue());
-			colorMap(se);
-		}
+				Map<String, Double> averageSignals;
+				averageSignals = calculateSignalAverages(signals);
 
+				for (Map.Entry<String, Double> s : averageSignals.entrySet()) {
+					SignalEntry se = new SignalEntry(s.getKey(), s.getValue());
+					new Handler(Looper.getMainLooper()).post(() -> {
+						try {
+							colorMap(se);
+						} catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
+					});
+				}
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 
 	public Map<String, Double> calculateSignalAverages(List<SignalEntry> signals) throws ParseException {
@@ -127,7 +134,7 @@ public class SignalActivity extends MapActivity {
 
 		for (SignalEntry entry : signals) {
 			String MGRS = entry.getMGRS();
-			// mgrs for 10 meter squares
+
 			verticesHelper.setBottom_left(MGRS);
 			String sw = verticesHelper.getBottom_left();
 
@@ -139,11 +146,19 @@ public class SignalActivity extends MapActivity {
 			signalMap.get(sw).add(signal);
 		}
 
+		int userLimit = mySettings.getNumber(getApplicationContext());
+
 		// Calculating the average signal for each MGRS area
 		Map<String, Double> averageSignals = new HashMap<>();
 		for (Map.Entry<String, List<Integer>> entry : signalMap.entrySet()) {
 			List<Integer> signalList = entry.getValue();
+
+			if (signalList.size() > userLimit) {
+				signalList = signalList.subList(0, userLimit);
+			}
+
 			double sum = 0;
+
 			for (int d : signalList) {
 				sum += d;
 			}
@@ -204,45 +219,90 @@ public class SignalActivity extends MapActivity {
 			PolygonOptions poly = new PolygonOptions().addAll(vertices).strokeWidth(0);
 
 			// check the mean value to color the square
-			if (s.getSignalAVG() >= 3.5) {
+			if (s.getSignalAVG() >= 3) {
 				poly.fillColor(Color.rgb(144, 238, 144));
-			} else if (s.getSignalAVG() < 3.5 && s.getSignalAVG() >= 1) {
+			} else if (s.getSignalAVG() < 3 && s.getSignalAVG() >= 1) {
 				poly.fillColor(Color.rgb(255, 215, 0));
 			} else {
 				poly.fillColor(Color.rgb(255, 0, 0));
 			}
+
 			mMap.addPolygon(poly);
+			mMap.setOnMapClickListener(arg0 -> {
+				Log.d("arg0", arg0.latitude + "-" + arg0.longitude);
+				double latitude = arg0.latitude;
+				double longitude = arg0.longitude;
+				Intent intent = new Intent(SignalActivity.this, AllDataFragment.class);
+				intent.putExtra("latitude", String.valueOf(latitude));
+				intent.putExtra("longitude", String.valueOf(longitude));
+				intent.putExtra("TYPE", "SIGNAL_DATA");
+				intent.putExtra("accuracy", String.valueOf(accuracy));
+				startActivity(intent);
+			});
 
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void saveInDatabase(int signal) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
-		String time = sdf.format(new Date());
-
-		MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
-
-		String mgrs_1 = mgrs.toString();
-
-		SignalEntry signalEntry = new SignalEntry(mgrs_1, signal, time);
-
-		DatabaseHelper databaseHelper = new DatabaseHelper(SignalActivity.this);
-
-		boolean success = databaseHelper.addSignalEntry(signalEntry);
-		Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
-		if (success) {
-			fetchData();
+	private void saveInDatabase(int signal) {
+		if (currentLocation == null) {
+			Toast.makeText(this, "Location not available.", Toast.LENGTH_SHORT).show();
+			return;
 		}
+		new Thread(() -> {
+
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd, HH:mm");
+			String time = sdf.format(new Date());
+
+			MGRS mgrs = MGRS.from(currentLocation.longitude, currentLocation.latitude);
+
+			String mgrs_1 = mgrs.toString();
+
+			SignalEntry signalEntry = new SignalEntry(mgrs_1, signal, time);
+
+			DatabaseHelper databaseHelper = new DatabaseHelper(SignalActivity.this);
+
+			boolean success = databaseHelper.addSignalEntry(signalEntry);
+
+			//Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
+			runOnUiThread(() -> {
+
+				if (success) {
+					List<SignalEntry> newSignal = new ArrayList<>();
+					newSignal.add(signalEntry);
+					int userLimit = mySettings.getNumber(getApplicationContext());
+
+					if (userLimit < signals.size()) {
+						signals = signals.subList(0, userLimit-1);
+					}
+
+					for (SignalEntry s : signals) {
+						if (s.getMGRS().equals(mgrs_1)) {
+							newSignal.add(s);
+						}
+					}
+					double total = 0;
+
+					for (SignalEntry s : newSignal) {
+						total += s.getSignal();
+					}
+					double average = total / newSignal.size();
+
+					try {
+						colorMap(new SignalEntry(mgrs_1, average));
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
+		}).start();
 	}
 
-	private boolean isPhonePermissionGranted() {
+	private void isPhonePermissionGranted() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, 1);
-			return false;
 		}
-		return true;
 	}
 }
 

@@ -17,68 +17,78 @@
     <!-- wifi permissions -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
+    <!-- Foreground and Notifications permissions -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+   <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/raccon_icon_no_bg_foreground"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Raccoon"
         tools:targetApi="31">
         <activity
-            android:name=".SoundActivity"
+            android:name=".Activities.SoundActivity"
             android:exported="false"
             android:label="@string/title_activity_map" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
+            android:label="Raccon"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
-            android:name=".YourDataActivity"
+            android:name=".Activities.MyDataActivity"
             android:exported="false"
             android:label="@string/your_data" />
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Activities.SettingsActivity"
             android:exported="false"
             android:label="@string/settings" />
 
         <activity
-            android:name=".SignalActivity"
+            android:name=".Activities.SignalActivity"
             android:exported="false"
-            android:label="@string/settings" />
+            android:label="@string/signal_map"
+            />
 
         <activity
-            android:name=".WiFiActivity"
+            android:name=".Activities.WiFiActivity"
             android:exported="false"
             android:label="@string/wi_fi_map" />
 
         <activity
-            android:name=".MapActivity"
+            android:name=".Activities.MapActivity"
             android:exported="false"
             android:label="@string/settings" />
+
+        <activity
+            android:name=".Fragments.AllDataFragment"
+            android:exported="false"
+            android:label="@string/your_data" />
+
+        <service
+            android:name=".Services.MyService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location|microphone" />
 
         <!-- meta data per maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/my_map_api_key" />
-        
-        <!-- services -->
-        <service
-            android:name=".Services.SoundService"
-            android:exported="false" />
-
-        <service
-            android:name=".Services.LocationService"
-            android:exported="false" />
-
 
     </application>
 

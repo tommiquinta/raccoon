@@ -43,7 +43,6 @@ public class SoundEntry implements Entry {
 		return decibel;
 	}
 
-
 	public String getTime() {
 		return timeString;
 	}
@@ -54,7 +53,6 @@ public class SoundEntry implements Entry {
 
 	@Override
 	public String toString() {
-		return "ID=" + sound_id + ", MGRS=" + MGRS + ", DB=" + decibel + ", TIME= " + timeString;
+		return "Decibel = " + decibel + ", \nDate: " + timeString;
 	}
-
 }

@@ -1,24 +1,39 @@
-package com.app.rakoon;
+package com.app.rakoon.Activities;
 // MainActivity.java
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.app.rakoon.R;
+
+import java.util.Objects;
 
 //import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+	private final int PERMISSION_ID = 42;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		/**
-		 * sound map activity
-		 */
+
+		Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+		getSupportActionBar().setCustomView(R.layout.custom_action_bar);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			requestPermissions();
+		}
+
 		Button btnGoToSoundActivity = findViewById(R.id.createSoundMapButton);
 
 		btnGoToSoundActivity.setOnClickListener(v -> {
@@ -55,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 		Button goToData = findViewById(R.id.data);
 
 		goToData.setOnClickListener(v -> {
-			Intent intent = new Intent(MainActivity.this, YourDataActivity.class);
+			Intent intent = new Intent(MainActivity.this, MyDataActivity.class);
 			startActivity(intent);
 		});
 
@@ -71,4 +86,11 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 	}
+
+	// Request permissions if not granted before
+	@RequiresApi(api = Build.VERSION_CODES.P)
+	private void requestPermissions() {
+		ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.FOREGROUND_SERVICE}, PERMISSION_ID);
+	}
+
 }

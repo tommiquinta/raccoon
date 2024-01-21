@@ -1,4 +1,4 @@
-package com.app.rakoon;
+package com.app.rakoon.Activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,15 +18,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.app.rakoon.Database.DatabaseHelper;
+import com.app.rakoon.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
@@ -42,11 +44,8 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	private FusedLocationProviderClient mFusedLocationClient;
 	GoogleMap mMap;
 	LatLng currentLocation;
-
 	private int accuracy = 10;
-
 	private DatabaseHelper databaseHelper;
-
 	/**
 	 * MGRS tile provider
 	 */
@@ -130,21 +129,24 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		mMap.clear();
 		Grids grids = Grids.create();
 
+		CameraPosition currentCameraPosition = mMap.getCameraPosition(); // Ottieni la posizione corrente della camera
+		LatLng currentLatLng = currentCameraPosition.target; // Ottieni la posizione corrente della mappa
+
 		tileProvider = MGRSTileProvider.create(this, grids);
 		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
 		if (accuracy == 10) {
 			grids.setWidth(GridType.TEN_METER, 1.0);
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 20F));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 20F));
 			mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
 			mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).
 		} else if (accuracy == 100) {
 			grids.setWidth(GridType.HUNDRED_METER, 1.0);
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.5F));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17.5F));
 			mMap.setMinZoomPreference(15.5F); // Set a preference for minimum zoom (Zoom out).
 			mMap.setMaxZoomPreference(17.5F); // Set a preference for maximum zoom (Zoom In).
 		} else if (accuracy == 1000) {
 			grids.setWidth(GridType.KILOMETER, 1.0);
-			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14.5F));
+			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12.5F));
 			mMap.setMinZoomPreference(12F); // Set a preference for minimum zoom (Zoom out).
 			mMap.setMaxZoomPreference(15.5F); // Set a preference for maximum zoom (Zoom In).
 		}
@@ -194,10 +196,8 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 						currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 						// add grid layer
 						mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
-
 						// red fixed marker
 						// mMap.addMarker(new MarkerOptions().position(currentLocation));
-
 						// PREFERENCES FRO 10 METERS SQUARES GRID --> is there a better way to do this?
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 20F));
 						mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
@@ -218,10 +218,10 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	// from previous location
 	@SuppressLint("MissingPermission")
 	private void requestNewLocationData() {
-		LocationRequest locationRequest = LocationRequest.create().setWaitForAccurateLocation(true);
-		locationRequest.setInterval(0);
-		locationRequest.setFastestInterval(0);
-		locationRequest.setNumUpdates(1);
+		LocationRequest locationRequest;
+		locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
+				.setWaitForAccurateLocation(true)
+				.build();
 
 		mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 		mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, Looper.myLooper());
@@ -257,9 +257,22 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	// when permission has been obtained, do the app work
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (requestCode == PERMISSION_ID && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 			getLastLocation();
 		}
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
 }

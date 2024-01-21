@@ -14,7 +14,6 @@ import java.util.List;
 
 // this is the DAO class, the one that will do all the operations
 public class DatabaseHelper extends SQLiteOpenHelper {
-
 	public static final String SOUND_DATA = "SOUND_DATA";
 	public static final String SIGNAL_DATA = "SIGNAL_DATA";
 	public static final String WIFI_DATA = "WIFI_DATA";
@@ -33,8 +32,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String createSoundTableStatement = "CREATE TABLE " + SOUND_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + DECIBEL + " FLOAT, " + TIME + " TEXT)";
-
 		db.execSQL(createSoundTableStatement);
+		String createSignalTableStatement = "CREATE TABLE " + SIGNAL_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + SIGNAL + " FLOAT, " + TIME + " TEXT)";
+		db.execSQL(createSignalTableStatement);
+		String createWiFiTableStatement = "CREATE TABLE " + WIFI_DATA + " (" + ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " + MGRS + " TEXT, " + WIFI + " FLOAT, " + TIME + " TEXT)";
+		db.execSQL(createWiFiTableStatement);
 	}
 
 	// update the database if app gets updated, used for compatibility
@@ -175,7 +177,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return wifiData;
 	}
 
-	// DELETE ONE SOUND ENTRY
+	public void deleteOne(Entry entry) {
+		if (entry instanceof SignalEntry) {
+			deleteOne((SignalEntry) entry);
+		} else if (entry instanceof SoundEntry) {
+			deleteOne((SoundEntry) entry);
+		} else if (entry instanceof WifiEntry) {
+			deleteOne((WifiEntry) entry);
+		}
+	}
+
+		// DELETE ONE SOUND ENTRY
 	public boolean deleteOne(SoundEntry soundEntry) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String query = "DELETE FROM " + SOUND_DATA + " WHERE  " + ID + " = " + soundEntry.getId();
@@ -190,7 +202,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public boolean deleteOne(SignalEntry signalEntry) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		String query = "DELETE FROM " + SIGNAL_DATA + " WHERE  " + ID + " = " + signalEntry.signal_id;
+		String query = "DELETE FROM " + SIGNAL_DATA + " WHERE  " + ID + " = " + signalEntry.getId();
 
 		Cursor cursor = db.rawQuery(query, null);
 		if (cursor.moveToFirst()) {
@@ -198,5 +210,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		} else {
 			return false;
 		}
+	}
+
+	public boolean deleteOne(WifiEntry wifiEntry) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "DELETE FROM " + WIFI_DATA + " WHERE  " + ID + " = " + wifiEntry.getId();
+
+		Cursor cursor = db.rawQuery(query, null);
+		if (cursor.moveToFirst()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void deleteSunds(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(SOUND_DATA, null, null);
+		db.close();
+	}
+	public void deleteWifi(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(WIFI_DATA, null, null);
+		db.close();
+	}
+	public void deleteSignal() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(SIGNAL_DATA, null, null);
+		db.close();
 	}
 }

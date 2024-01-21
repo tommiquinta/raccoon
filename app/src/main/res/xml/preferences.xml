@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Background Operations">
+
+        <SwitchPreferenceCompat
+            android:id="@+id/switchSound"
+            app:key="background"
+            app:title="Background Measurement" />
+
+        <CheckBoxPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="Sound_bg"
+            app:title="Sound" />
+        <!--app:dependency="background" /> -->
+
+        <CheckBoxPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="wifi_bg"
+            app:title="WiFi" />
+        <!--app:dependency="background" /> -->
+
+        <CheckBoxPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:key="signal_bg"
+            app:title="Signal" />
+        <!--app:dependency="background" /> -->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Background Settings">
+        <EditTextPreference
+            android:defaultValue="3"
+            android:inputType="phone"
+            android:key="numeric_preference"
+            android:summary="3"
+            android:title="Minutes between measurements" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Map">
+        <EditTextPreference
+            android:defaultValue="3"
+            android:inputType="numberPassword"
+            android:key="last_measurements"
+            android:summary="3"
+            android:title="Number of last measurements" />
+    </PreferenceCategory>
+</PreferenceScreen>

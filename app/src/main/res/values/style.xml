@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ButtonTextStyle">
+        <item name="android:textSize">25sp</item>
+
+        <item name="android:textColor">#FC6713</item>
+        <item name="android:fontFamily">@font/font1</item>
+    </style>
+
+</resources>
