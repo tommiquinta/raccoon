@@ -12,6 +12,9 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.app.rakoon.Database.DatabaseHelper;
 import com.app.rakoon.Database.Entry;
+import com.app.rakoon.Database.SignalEntry;
+import com.app.rakoon.Database.SoundEntry;
+import com.app.rakoon.Database.WifiEntry;
 import com.app.rakoon.R;
 
 import java.text.ParseException;
@@ -25,6 +28,7 @@ public class AllDataFragment extends FragmentActivity {
 	String lon;
 	String accuracy;
 	String type;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,7 +83,7 @@ public class AllDataFragment extends FragmentActivity {
 
 
 		assert entryList != null;
-		for(Entry s: entryList){
+		for (Entry s : entryList) {
 			String new_bottom_left = String.valueOf(s.getMGRS());
 
 			long new_easting = MGRS.parse(new_bottom_left).getEasting();
@@ -89,20 +93,57 @@ public class AllDataFragment extends FragmentActivity {
 
 			new_bottom_left = new_bottom_left.substring(0, 5) + new_easting + new_northing;
 
-			if(new_bottom_left.equals(bottom_left)){
+			if (new_bottom_left.equals(bottom_left)) {
 				new_list.add(s);
 			}
 		}
 
-
-		if(new_list.isEmpty()){
-			TextView textView = findViewById(R.id.no_data);
+		if (new_list.isEmpty()) {
+			TextView textView = findViewById(R.id.average);
+			textView.setText("no data for this zone");
 			textView.setVisibility(View.VISIBLE);
 			return;
+		} else {
+			TextView textView = findViewById(R.id.average);
+			textView.setVisibility(View.VISIBLE);
+			double total = 0;
+
+			int userLimit = mySettings.getNumber(getApplicationContext());
+			if (new_list.size() > userLimit) {
+				new_list = new_list.subList(0, userLimit);
+			}
+
+			for (Entry e : new_list) {
+				switch (type) {
+					case "SIGNAL_DATA":
+						SignalEntry s = (SignalEntry) e;
+						total += s.getSignal();
+						break;
+					case "SOUND_DATA":
+						SoundEntry se = (SoundEntry) e;
+						total += se.getDecibel();
+						break;
+					case "WIFI_DATA":
+						WifiEntry we = (WifiEntry) e;
+						total += we.getWifi();
+						break;
+				}
+			}
+			double average = total / new_list.size();
+			String averageString = String.valueOf(average);
+
+			if (averageString.length() > 5) {
+				averageString = averageString.substring(0, 5);
+			}
+
+			if (new_list.size() < userLimit) {
+				textView.setText("Average of all measurements:\n" + averageString);
+			} else {
+				textView.setText("Average of the last " + userLimit + " measurements:\n" + averageString);
+			}
 		}
 
 		ArrayAdapter<Entry> arrayAdapter = new ArrayAdapter<Entry>(AllDataFragment.this, android.R.layout.simple_list_item_1, new_list);
 		data_view.setAdapter(arrayAdapter);
-
 	}
 }

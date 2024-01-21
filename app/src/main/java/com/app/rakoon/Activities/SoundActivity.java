@@ -40,12 +40,10 @@ import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
 
 public class SoundActivity extends MapActivity {
-
 	// audio
 	private boolean isRecording = false;
 	private static int accuracy;
 	private DatabaseHelper databaseHelper;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -139,13 +137,12 @@ public class SoundActivity extends MapActivity {
 			List<Double> decibelList = entry.getValue();
 
 			if (decibelList.size() > userLimit) {
-				decibelList = decibelList.subList(0, userLimit-1);
+				decibelList = decibelList.subList(0, userLimit);
 			}
 
 			double sum = 0;
 
 			for (double d : decibelList) {
-				Log.d("sound: ", String.valueOf(d));
 				sum += d;
 			}
 			double average = sum / decibelList.size();
@@ -199,7 +196,6 @@ public class SoundActivity extends MapActivity {
 			 */
 
 			PolygonOptions poly = new PolygonOptions().addAll(vertices).strokeWidth(0);
-
 			// check the mean value to color the square
 			if (s.getDecibel() <= 50) {
 				poly.fillColor(Color.rgb(144, 238, 144));

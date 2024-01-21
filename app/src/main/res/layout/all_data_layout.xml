@@ -6,23 +6,25 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/data_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <TextView
-        android:id="@+id/no_data"
+        android:id="@+id/average"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="@style/ButtonTextStyle2"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
         android:textAlignment="center"
-        android:text="No data for this zone."
-        android:visibility="invisible"
+        android:textAppearance="@style/ButtonTextStyle2"
+        android:visibility="invisible" />
 
+    <ListView
+        android:id="@+id/data_view"
+        android:layout_marginTop="20dp"
 
-    />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+       />
 
 </RelativeLayout>
