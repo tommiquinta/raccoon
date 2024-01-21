@@ -139,7 +139,7 @@ public class SoundActivity extends MapActivity {
 			List<Double> decibelList = entry.getValue();
 
 			if (decibelList.size() > userLimit) {
-				decibelList = decibelList.subList(0, userLimit);
+				decibelList = decibelList.subList(0, userLimit-1);
 			}
 
 			double sum = 0;
@@ -263,14 +263,13 @@ public class SoundActivity extends MapActivity {
 
 			boolean success = databaseHelper.addSoundEntry(soundEntry);
 			runOnUiThread(() -> {
-				//Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 				if (success) {
 					List<SoundEntry> newSounds = new ArrayList<>();
 					newSounds.add(soundEntry);
 					int userLimit = mySettings.getNumber(getApplicationContext());
 
-					if (newSounds.size() > userLimit) {
-						newSounds = newSounds.subList(0, userLimit);
+					if (userLimit < sounds.size()) {
+						sounds = sounds.subList(0, userLimit-1);
 					}
 
 					for (SoundEntry s : sounds) {

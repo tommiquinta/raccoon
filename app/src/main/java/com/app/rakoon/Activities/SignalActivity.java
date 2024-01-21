@@ -273,8 +273,8 @@ public class SignalActivity extends MapActivity {
 					newSignal.add(signalEntry);
 					int userLimit = mySettings.getNumber(getApplicationContext());
 
-					if (newSignal.size() > userLimit) {
-						newSignal = newSignal.subList(0, userLimit);
+					if (userLimit < signals.size()) {
+						signals = signals.subList(0, userLimit-1);
 					}
 
 					for (SignalEntry s : signals) {

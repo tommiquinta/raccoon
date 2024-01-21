@@ -267,8 +267,8 @@ public class WiFiActivity extends MapActivity {
 					newWiFi.add(wifiEntry);
 					int userLimit = mySettings.getNumber(getApplicationContext());
 
-					if (newWiFi.size() > userLimit) {
-						newWiFi = newWiFi.subList(0, userLimit);
+					if (userLimit < wifis.size()) {
+						wifis = wifis.subList(0, userLimit-1);
 					}
 
 					for (WifiEntry s : wifis) {
