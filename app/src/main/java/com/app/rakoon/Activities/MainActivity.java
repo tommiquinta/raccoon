@@ -16,11 +16,9 @@ import com.app.rakoon.R;
 
 import java.util.Objects;
 
-//import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 	private final int PERMISSION_ID = 42;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
 			Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
 			startActivity(intent);
 		});
-
 	}
 
 	// Request permissions if not granted before

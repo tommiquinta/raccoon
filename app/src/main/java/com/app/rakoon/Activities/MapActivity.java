@@ -62,22 +62,6 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		// initialize database DAO
 		databaseHelper = new DatabaseHelper(MapActivity.this);
 
-		// get the API key
-	/*	try {
-			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-			String apiKey = ai.metaData.getString("com.google.android.geo.API_KEY");
-
-			// Initializing the Places API with the help of our API_KEY
-			if (!Places.isInitialized()) {
-				Places.initialize(getApplicationContext(), apiKey);
-			}
-		} catch (PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
-		}
-
-	 */
-
-
 		// create map fragment
 		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 		assert mapFragment != null;
@@ -129,8 +113,8 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 		mMap.clear();
 		Grids grids = Grids.create();
 
-		CameraPosition currentCameraPosition = mMap.getCameraPosition(); // Ottieni la posizione corrente della camera
-		LatLng currentLatLng = currentCameraPosition.target; // Ottieni la posizione corrente della mappa
+		CameraPosition currentCameraPosition = mMap.getCameraPosition();
+		LatLng currentLatLng = currentCameraPosition.target;
 
 		tileProvider = MGRSTileProvider.create(this, grids);
 		mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
@@ -161,14 +145,9 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		mMap = googleMap;
 		mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-		//mMap.setOnCameraIdleListener(this);
-		//mMap.setOnMapClickListener(this);
 		getLastLocation();
 	}
 
-	/**
-	 * overrided method
-	 */
 	public void fetchData() throws ParseException {
 	}
 
@@ -198,7 +177,6 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 						mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
 						// red fixed marker
 						// mMap.addMarker(new MarkerOptions().position(currentLocation));
-						// PREFERENCES FRO 10 METERS SQUARES GRID --> is there a better way to do this?
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 20F));
 						mMap.setMinZoomPreference(18F); // Set a preference for minimum zoom (Zoom out).
 						mMap.setMaxZoomPreference(20.5F); // Set a preference for maximum zoom (Zoom In).

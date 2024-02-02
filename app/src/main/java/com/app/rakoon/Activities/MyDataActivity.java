@@ -26,15 +26,7 @@ public class MyDataActivity extends AppCompatActivity {
 		getSupportActionBar().setCustomView(R.layout.data_custom_bar);
 
 		databaseHelper = new DatabaseHelper(MyDataActivity.this);
-		/*
-		updateView();
 
-		data_view.setOnItemClickListener((parent, view, position, l) -> {
-			SignalEntry soundEntry = (SignalEntry) parent.getItemAtPosition(position);
-			databaseHelper.deleteOne(soundEntry);
-			updateView();
-		});
-		*/
 		Button delete_sound = findViewById(R.id.delete_sound);
 
 		delete_sound.setOnClickListener(v -> {
@@ -69,17 +61,6 @@ public class MyDataActivity extends AppCompatActivity {
 	private void delete_sound() {
 		databaseHelper.deleteSunds();
 		Toast.makeText(this, "Data deleted successfully", Toast.LENGTH_SHORT).show();
-	}
-
-	protected void updateView() {
-		/*
-		data_view = findViewById(R.id.data_view);
-		DatabaseHelper databaseHelper = new DatabaseHelper(YourDataActivity.this);
-		List<SignalEntry> sounds = databaseHelper.getSignals();
-		//Toast.makeText(this, "Size: " + sounds.size(), Toast.LENGTH_SHORT).show();
-		ArrayAdapter<SignalEntry> arrayAdapter = new ArrayAdapter<SignalEntry>(YourDataActivity.this, android.R.layout.simple_list_item_1, sounds);
-		data_view.setAdapter(arrayAdapter);
-		 */
 	}
 
 	@Override

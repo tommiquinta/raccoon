@@ -44,6 +44,7 @@ public class SoundActivity extends MapActivity {
 	private boolean isRecording = false;
 	private static int accuracy;
 	private DatabaseHelper databaseHelper;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,11 +54,10 @@ public class SoundActivity extends MapActivity {
 
 		databaseHelper = new DatabaseHelper(SoundActivity.this);
 
-		// button to record sound decibel
 		ImageButton getDecibel = findViewById(R.id.getDecibel);
 
 		getDecibel.setOnClickListener(v -> {
-			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
 				if (!isRecording) {
 					try {
 						startRecording();
@@ -68,7 +68,8 @@ public class SoundActivity extends MapActivity {
 					stopRecording();
 				}
 			} else {
-				Toast.makeText(this, "Location not available.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "You have to allow Microphone permissions.", Toast.LENGTH_SHORT).show();
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
 			}
 		});
 	}
@@ -232,11 +233,14 @@ public class SoundActivity extends MapActivity {
 			double sound = soundHelper.getSound();
 			if (sound != Double.POSITIVE_INFINITY && sound != Double.NEGATIVE_INFINITY) {
 				displayDecibel(sound);
-				saveInDatabase(sound);
+				if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+					saveInDatabase(sound);
+				} else {
+					Toast.makeText(this, "Location not available.", Toast.LENGTH_SHORT).show();
+				}
 			}
 		}
 	}
-
 
 	private void saveInDatabase(double db) throws ParseException {
 		if (currentLocation == null) {
@@ -265,7 +269,7 @@ public class SoundActivity extends MapActivity {
 					int userLimit = mySettings.getNumber(getApplicationContext());
 
 					if (userLimit < sounds.size()) {
-						sounds = sounds.subList(0, userLimit-1);
+						sounds = sounds.subList(0, userLimit - 1);
 					}
 
 					for (SoundEntry s : sounds) {

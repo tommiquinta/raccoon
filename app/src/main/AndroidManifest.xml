@@ -39,7 +39,7 @@
             android:label="@string/title_activity_map" />
         <activity
             android:name=".Activities.MainActivity"
-            android:label="Raccon"
+            android:label="Raccoon"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

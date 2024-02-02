@@ -51,18 +51,13 @@ public class WiFiActivity extends MapActivity {
 
 		databaseHelper = new DatabaseHelper(WiFiActivity.this);
 
-		// button to record sound decibel
-		ImageButton getDecibel = findViewById(R.id.getDecibel);
+		ImageButton getWifi = findViewById(R.id.getDecibel);
 
-		getDecibel.setOnClickListener(v -> {
-			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-				try {
-					getWiFi();
-				} catch (ParseException e) {
-					throw new RuntimeException(e);
-				}
-			} else {
-				Toast.makeText(this, "Location not available.", Toast.LENGTH_SHORT).show();
+		getWifi.setOnClickListener(v -> {
+			try {
+				getWiFi();
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
 			}
 		});
 	}
@@ -74,7 +69,11 @@ public class WiFiActivity extends MapActivity {
 			Toast.makeText(this, "No WiFi network Available.", Toast.LENGTH_SHORT).show();
 		} else {
 			Toast.makeText(this, "Wifi Level: " + getDescription(signalStrength), Toast.LENGTH_SHORT).show();
-			saveInDatabaseAsync(signalStrength);
+			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+				saveInDatabaseAsync(signalStrength);
+			} else {
+				Toast.makeText(this, "Location not available.", Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 
@@ -261,14 +260,13 @@ public class WiFiActivity extends MapActivity {
 			final boolean success = databaseHelper.addWifiEntry(wifiEntry);
 
 			runOnUiThread(() -> {
-				//Toast.makeText(WiFiActivity.this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 				if (success) {
 					List<WifiEntry> newWiFi = new ArrayList<>();
 					newWiFi.add(wifiEntry);
 					int userLimit = mySettings.getNumber(getApplicationContext());
 
 					if (userLimit < wifis.size()) {
-						wifis = wifis.subList(0, userLimit-1);
+						wifis = wifis.subList(0, userLimit - 1);
 					}
 
 					for (WifiEntry s : wifis) {

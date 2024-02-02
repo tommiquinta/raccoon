@@ -55,9 +55,9 @@ public class SignalActivity extends MapActivity {
 		getSupportActionBar().setCustomView(R.layout.signal_action_bar);
 
 		// button to record sound decibel
-		ImageButton getDecibel = findViewById(R.id.getDecibel);
+		ImageButton getSignal = findViewById(R.id.getDecibel);
 
-		getDecibel.setOnClickListener(v -> {
+		getSignal.setOnClickListener(v -> {
 			if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 				try {
 					getSignal();
@@ -65,7 +65,7 @@ public class SignalActivity extends MapActivity {
 					throw new RuntimeException(e);
 				}
 			} else {
-				Toast.makeText(this, "Location not available.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "Signal data not available due to coarse location permission not given.", Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
@@ -265,9 +265,7 @@ public class SignalActivity extends MapActivity {
 
 			boolean success = databaseHelper.addSignalEntry(signalEntry);
 
-			//Toast.makeText(this, "Saved: " + success, Toast.LENGTH_SHORT).show();
 			runOnUiThread(() -> {
-
 				if (success) {
 					List<SignalEntry> newSignal = new ArrayList<>();
 					newSignal.add(signalEntry);

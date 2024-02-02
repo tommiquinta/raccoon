@@ -52,9 +52,7 @@ public class VerticesHelper {
 		long northing = MGRS.parse(bottom_left).getNorthing();
 		northing = northing / accuracy;
 		northing = northing + 1;
-
 		top_left = bottom_left.substring(0, 5) + easting + northing;
-
 		return top_left;
 	}
 

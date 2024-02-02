@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -88,7 +89,6 @@ public class SettingsActivity extends AppCompatActivity {
 	}
 
 
-
 	private void askNotificationPermission() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
 				!= PackageManager.PERMISSION_GRANTED) {
@@ -133,7 +133,12 @@ public class SettingsActivity extends AppCompatActivity {
 
 		if (requestCode == REQUEST_CODE_BACKGROUND_LOCATION_PERMISSION) {
 			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				startService();
+				LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+				if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+					Toast.makeText(this, "Please enable location.", Toast.LENGTH_SHORT).show();
+				} else {
+					startService();
+				}
 			} else {
 				Toast.makeText(this, "Permission denied. Please enable background location in your device settings.", Toast.LENGTH_SHORT).show();
 			}
